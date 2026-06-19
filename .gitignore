@@ -2,3 +2,14 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Secrets / variables d'environnement (ne jamais committer de clés)
+.env
+.env.*
+!.env.example
+
+# Local Supabase database password generated for project creation
+supabase/.db-password
+
+# Dossier de travail des photos (téléchargées, choisies à la main) — pas dans git
+Photo Instagram Théo/

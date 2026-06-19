@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "theo-apercu",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "site", "-l", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "theo-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "app"],
+      "port": 5173
+    }
+  ]
+}
