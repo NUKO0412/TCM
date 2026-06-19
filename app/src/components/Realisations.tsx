@@ -50,6 +50,12 @@ function Carousel({
     a[i] = { src: url, alt: cur.alt ?? '' }
     save(a)
   }
+  // Retire la photo affichée (et seulement elle).
+  const removePhoto = () => {
+    const next = images.filter((_, k) => k !== i)
+    save(next)
+    setIdx(Math.max(0, i - 1))
+  }
   // Ajoute une ou plusieurs photos. Au-delà de 3, on écrase la plus ancienne (FIFO).
   const addMany = async (files: FileList | null) => {
     if (!files || !files.length) return
@@ -115,6 +121,14 @@ function Carousel({
           >
             {busy ? 'Envoi…' : `＋ Photo (${filled.length}/${MAX})`}
           </button>
+          {filled.length > 0 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); removePhoto() }}
+              title="Retirer la photo affichée"
+            >
+              ✕ Retirer
+            </button>
+          )}
           <input
             ref={multiRef}
             type="file"
@@ -140,6 +154,9 @@ export function Realisations() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
       if (document.querySelector('.lightbox')) return
+      // Pendant la saisie d'un texte, ←/→ servent à se déplacer dans le texte.
+      const ae = document.activeElement as HTMLElement | null
+      if (ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return
       const card = document.querySelector('.gal .shot:hover')
       const btn = card?.querySelector<HTMLButtonElement>(
         e.key === 'ArrowLeft' ? '.carousel-arrow.prev' : '.carousel-arrow.next',
