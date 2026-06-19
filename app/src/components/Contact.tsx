@@ -69,6 +69,26 @@ export function Contact() {
                 <div key={item.icon}>{inner}</div>
               )
             })}
+            <a
+              href="https://www.instagram.com/tcm_agencements/?hl=fr"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="ci">
+                <Icon name="i-instagram" />
+              </span>{' '}
+              Instagram
+            </a>
+            <a
+              href="https://www.facebook.com/profile.php?id=61556346415173"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="ci">
+                <Icon name="i-facebook" />
+              </span>{' '}
+              Facebook
+            </a>
           </div>
         </div>
 
