@@ -12,6 +12,10 @@ const ROUTE_FOR_LABEL: Record<string, string> = {
 const resolveHref = (l: { label: string; href: string }) =>
   l.href && l.href !== '#' ? l.href : (ROUTE_FOR_LABEL[l.label] ?? l.href)
 
+// Liens déjà couverts par la colonne dédiée « Informations légales » : on évite
+// le doublon dans les colonnes issues du contenu (ex. « Mentions légales »).
+const OWNED_BY_LEGAL_COL = new Set(['Mentions légales'])
+
 export function Footer() {
   const { header, footer } = useContent()
   return (
@@ -33,7 +37,7 @@ export function Footer() {
           {footer.columns.map((col) => (
             <div className="foot-col" key={col.title}>
               <h4>{col.title}</h4>
-              {col.links.map((l) => {
+              {col.links.filter((l) => !OWNED_BY_LEGAL_COL.has(l.label)).map((l) => {
                 const href = resolveHref(l)
                 return href.startsWith('/') ? (
                   <Link to={href} key={l.label}>

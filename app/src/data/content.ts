@@ -143,7 +143,6 @@ export const content: SiteContent = {
         links: [
           { label: 'Connexion', href: '/connexion' },
           { label: 'Espace administrateur', href: '/admin/messages' },
-          { label: 'Mentions légales', href: '/mentions-legales' },
         ],
       },
     ],
