@@ -117,8 +117,8 @@ export const content: SiteContent = {
     intro: 'Décrivez votre besoin en quelques lignes : on vous rappelle pour fixer une visite et un devis clair.',
     info: [
       { icon: 'i-pin', text: 'Lorient · Morbihan (56)' },
-      { icon: 'i-phone', text: '02 97 00 00 00' },
-      { icon: 'i-mail', text: 'contact@tcm-agencement.fr' },
+      { icon: 'i-phone', text: '06 31 01 07 57' },
+      { icon: 'i-mail', text: 'theo.caheric@gmail.com' },
     ],
     projectTypes: ['Cuisine', 'Dressing / placard', 'Parquet', 'Bibliothèque', 'Porte sur mesure', 'Terrasse', 'Agencement complet', 'Autre'],
     legal: 'Vos informations restent confidentielles et ne servent qu’à vous recontacter.',

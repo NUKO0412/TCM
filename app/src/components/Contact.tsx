@@ -1,13 +1,23 @@
 import { useState, type FormEvent } from 'react'
 import { useContent } from '../features/content/useContent'
+import { useEditMode } from '../features/edit/useEditMode'
 import { EditableText } from '../features/edit/EditableText'
 import { submitContactRequest } from '../features/contact/submit'
 import { Icon } from './IconDefs'
+
+// Téléphone -> lien d'appel, email -> lien mail (cliquables hors édition).
+const linkFor = (icon: string, text: string) =>
+  icon === 'i-phone'
+    ? `tel:${text.replace(/[^\d+]/g, '')}`
+    : icon === 'i-mail'
+      ? `mailto:${text.trim()}`
+      : null
 
 const empty = { nom: '', prenom: '', email: '', telephone: '', ville: '', type_projet: '', message: '' }
 
 export function Contact() {
   const { eyebrow, heading, intro, info, projectTypes, legal, submitLabel } = useContent().contact
+  const { editing } = useEditMode()
   const [form, setForm] = useState({ ...empty, type_projet: projectTypes[0] ?? '' })
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
@@ -41,14 +51,24 @@ export function Contact() {
             <EditableText sectionKey="contact" path="intro" value={intro} multiline />
           </p>
           <div className="cinfo reveal">
-            {info.map((i, idx) => (
-              <div key={i.icon}>
-                <span className="ci">
-                  <Icon name={i.icon} />
-                </span>{' '}
-                <EditableText sectionKey="contact" path={`info.${idx}.text`} value={i.text} />
-              </div>
-            ))}
+            {info.map((item, idx) => {
+              const inner = (
+                <>
+                  <span className="ci">
+                    <Icon name={item.icon} />
+                  </span>{' '}
+                  <EditableText sectionKey="contact" path={`info.${idx}.text`} value={item.text} />
+                </>
+              )
+              const href = linkFor(item.icon, item.text)
+              return !editing && href ? (
+                <a key={item.icon} href={href}>
+                  {inner}
+                </a>
+              ) : (
+                <div key={item.icon}>{inner}</div>
+              )
+            })}
           </div>
         </div>
 

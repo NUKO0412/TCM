@@ -1,6 +1,7 @@
 import { useContent } from '../features/content/useContent'
 import { EditableText } from '../features/edit/EditableText'
 import { Logo } from './Logo'
+import { Icon } from './IconDefs'
 
 export function Footer() {
   const { header, footer } = useContent()
@@ -19,6 +20,24 @@ export function Footer() {
             <p>
               <EditableText sectionKey="footer" path="brandDesc" value={footer.brandDesc} multiline />
             </p>
+            <div className="social">
+              <a
+                href="https://www.instagram.com/tcm_agencements/?hl=fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram TCM Agencement"
+              >
+                <Icon name="i-instagram" />
+              </a>
+              <a
+                href="https://www.facebook.com/profile.php?id=61556346415173"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook TCM Agencement"
+              >
+                <Icon name="i-facebook" />
+              </a>
+            </div>
           </div>
           {footer.columns.map((col) => (
             <div className="foot-col" key={col.title}>
