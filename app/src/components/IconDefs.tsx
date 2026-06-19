@@ -79,9 +79,11 @@ export function IconDefs() {
 }
 
 // Petit utilitaire : une icône qui référence une définition par sa clé.
+// viewBox 0 0 24 24 : les icônes sont dessinées en repère 24 → elles tiennent
+// entièrement quelle que soit la taille de rendu (sinon les bords sont rognés).
 export function Icon({ name, className = 'i', style }: { name: string; className?: string; style?: React.CSSProperties }) {
   return (
-    <svg className={className} style={style}>
+    <svg className={className} style={style} viewBox="0 0 24 24">
       <use href={`#${name}`} />
     </svg>
   )
