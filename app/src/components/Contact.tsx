@@ -104,11 +104,23 @@ export function Contact() {
             <div className="row">
               <div className="field">
                 <label>Nom</label>
-                <input placeholder="Le Gall" value={form.nom} onChange={set('nom')} />
+                <input
+                  name="lastName"
+                  autoComplete="family-name"
+                  placeholder="Le Gall"
+                  value={form.nom}
+                  onChange={set('nom')}
+                />
               </div>
               <div className="field">
                 <label>Prénom</label>
-                <input placeholder="Yann" value={form.prenom} onChange={set('prenom')} />
+                <input
+                  name="firstName"
+                  autoComplete="given-name"
+                  placeholder="Yann"
+                  value={form.prenom}
+                  onChange={set('prenom')}
+                />
               </div>
             </div>
             <div className="row">
@@ -116,6 +128,8 @@ export function Contact() {
                 <label>Email</label>
                 <input
                   type="email"
+                  name="email"
+                  autoComplete="email"
                   required
                   placeholder="vous@email.fr"
                   value={form.email}
@@ -124,17 +138,30 @@ export function Contact() {
               </div>
               <div className="field">
                 <label>Téléphone</label>
-                <input placeholder="06 .. .. .. .." value={form.telephone} onChange={set('telephone')} />
+                <input
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="06 .. .. .. .."
+                  value={form.telephone}
+                  onChange={set('telephone')}
+                />
               </div>
             </div>
             <div className="row">
               <div className="field">
                 <label>Ville</label>
-                <input placeholder="Lorient" value={form.ville} onChange={set('ville')} />
+                <input
+                  name="city"
+                  autoComplete="address-level2"
+                  placeholder="Lorient"
+                  value={form.ville}
+                  onChange={set('ville')}
+                />
               </div>
               <div className="field">
                 <label>Type de projet</label>
-                <select value={form.type_projet} onChange={set('type_projet')}>
+                <select name="projectType" value={form.type_projet} onChange={set('type_projet')}>
                   {projectTypes.map((t) => (
                     <option key={t}>{t}</option>
                   ))}
@@ -144,6 +171,7 @@ export function Contact() {
             <div className="field">
               <label>Votre message</label>
               <textarea
+                name="message"
                 placeholder="Décrivez votre projet, la pièce, les dimensions approximatives…"
                 value={form.message}
                 onChange={set('message')}

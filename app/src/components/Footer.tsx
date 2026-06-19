@@ -3,6 +3,15 @@ import { useContent } from '../features/content/useContent'
 import { EditableText } from '../features/edit/EditableText'
 import { Logo } from './Logo'
 
+// Liens « Accès » historiquement en placeholder `#` → vraies routes de l'app.
+const ROUTE_FOR_LABEL: Record<string, string> = {
+  Connexion: '/connexion',
+  'Espace administrateur': '/admin/messages',
+  'Mentions légales': '/mentions-legales',
+}
+const resolveHref = (l: { label: string; href: string }) =>
+  l.href && l.href !== '#' ? l.href : (ROUTE_FOR_LABEL[l.label] ?? l.href)
+
 export function Footer() {
   const { header, footer } = useContent()
   return (
@@ -24,11 +33,18 @@ export function Footer() {
           {footer.columns.map((col) => (
             <div className="foot-col" key={col.title}>
               <h4>{col.title}</h4>
-              {col.links.map((l) => (
-                <a href={l.href} key={l.label}>
-                  {l.label}
-                </a>
-              ))}
+              {col.links.map((l) => {
+                const href = resolveHref(l)
+                return href.startsWith('/') ? (
+                  <Link to={href} key={l.label}>
+                    {l.label}
+                  </Link>
+                ) : (
+                  <a href={href} key={l.label}>
+                    {l.label}
+                  </a>
+                )
+              })}
             </div>
           ))}
           <div className="foot-col">

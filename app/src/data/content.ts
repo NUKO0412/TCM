@@ -141,9 +141,9 @@ export const content: SiteContent = {
       {
         title: 'Accès',
         links: [
-          { label: 'Connexion', href: '#' },
-          { label: 'Espace administrateur', href: '#' },
-          { label: 'Mentions légales', href: '#' },
+          { label: 'Connexion', href: '/connexion' },
+          { label: 'Espace administrateur', href: '/admin/messages' },
+          { label: 'Mentions légales', href: '/mentions-legales' },
         ],
       },
     ],

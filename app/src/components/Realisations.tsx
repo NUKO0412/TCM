@@ -19,6 +19,14 @@ const MAX = 3
 const sizeLabel = (sp: string) => (sp === 's-a' ? 'Grande' : sp === 's-f' ? 'Moyenne' : 'Petite')
 const nextSpan = (sp: string) => (sp === 's-a' ? 's-b' : sp === 's-f' ? 's-a' : 's-f')
 
+// Texte alternatif utile : alt propre de la photo si renseigné, sinon dérivé
+// du titre/catégorie de la réalisation (fallback générique en dernier recours).
+function altFor(data: Record<string, unknown>, photoAlt: string): string {
+  if (photoAlt && photoAlt.trim()) return photoAlt.trim()
+  const parts = [s(data.title).trim(), s(data.category).trim()].filter(Boolean)
+  return parts.length ? `Réalisation TCM Agencement — ${parts.join(', ')}` : 'Réalisation TCM Agencement'
+}
+
 // Lit les photos d'une réalisation (tableau `images`, ou ancien champ `img`).
 function readImages(data: Record<string, unknown>): Photo[] {
   if (Array.isArray(data.images) && data.images.length) return data.images as Photo[]
@@ -82,14 +90,18 @@ function Carousel({
     <>
       <EditableImage
         src={cur.src}
-        alt={cur.alt ?? ''}
+        alt={altFor(item.data, cur.alt ?? '')}
         onReplace={replace}
         onFiles={(files) => void addMany(files)}
         onView={
           !editing && cur.src
             ? () => {
                 const photos = images.filter((p) => p.src)
-                onView({ images: photos, index: Math.max(0, photos.indexOf(cur)) })
+                const index = Math.max(0, photos.indexOf(cur))
+                onView({
+                  images: photos.map((p) => ({ src: p.src, alt: altFor(item.data, p.alt ?? '') })),
+                  index,
+                })
               }
             : undefined
         }
