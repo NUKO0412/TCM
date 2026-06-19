@@ -16,7 +16,7 @@ const linkFor = (icon: string, text: string) =>
 const empty = { nom: '', prenom: '', email: '', telephone: '', ville: '', type_projet: '', message: '' }
 
 export function Contact() {
-  const { eyebrow, heading, intro, info, projectTypes, legal, submitLabel } = useContent().contact
+  const { eyebrow, heading, intro, info, projectTypes, submitLabel } = useContent().contact
   const { editing } = useEditMode()
   const [form, setForm] = useState({ ...empty, type_projet: projectTypes[0] ?? '' })
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -155,13 +155,11 @@ export function Contact() {
                 <Icon name="i-send" className="" />
               </span>
             </button>
-            <div className="legal">
-              {status === 'error' ? (
+            {status === 'error' && (
+              <div className="legal">
                 <span style={{ color: '#e0a070' }}>Échec de l'envoi, réessayez.</span>
-              ) : (
-                <EditableText sectionKey="contact" path="legal" value={legal} />
-              )}
-            </div>
+              </div>
+            )}
           </form>
         )}
       </div>

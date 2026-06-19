@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useContent } from '../features/content/useContent'
 import { EditableText } from '../features/edit/EditableText'
 import { Logo } from './Logo'
@@ -30,6 +31,12 @@ export function Footer() {
               ))}
             </div>
           ))}
+          <div className="foot-col">
+            <h4>Informations légales</h4>
+            <Link to="/mentions-legales">Mentions légales</Link>
+            <Link to="/mentions-legales#confidentialite">Politique de confidentialité</Link>
+            <Link to="/mentions-legales#cookies">Politique de cookies</Link>
+          </div>
         </div>
         <div className="foot-bottom">
           <span>
