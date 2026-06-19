@@ -48,7 +48,7 @@ function readCookie(request: Request, name: string) {
   return ''
 }
 
-export async function middleware(request: Request) {
+export default async function middleware(request: Request) {
   const expected = process.env.SITE_PASSWORD
   if (!expected) return next() // pas de protection tant que SITE_PASSWORD non défini
 
