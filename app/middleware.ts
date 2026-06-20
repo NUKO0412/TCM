@@ -5,7 +5,7 @@ import { next } from '@vercel/edge'
 export const config = { matcher: '/(.*)' }
 
 const COOKIE_NAME = 'tcm_access'
-const COOKIE_TTL = 60 * 60 * 24 * 7
+const COOKIE_TTL = 60 * 60 * 24 * 30
 
 function pageLogin(error = '') {
   const html = `<!doctype html>

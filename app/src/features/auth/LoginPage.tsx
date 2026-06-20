@@ -37,7 +37,8 @@ export function LoginPage() {
           <label>Email</label>
           <input
             type="email"
-            autoComplete="email"
+            name="email"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -47,6 +48,7 @@ export function LoginPage() {
           <label>Mot de passe</label>
           <input
             type="password"
+            name="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

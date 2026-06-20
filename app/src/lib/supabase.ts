@@ -20,4 +20,9 @@ if (!isSupabaseConfigured) {
 export const supabase = createClient(
   url ?? 'https://placeholder.supabase.co',
   anonKey ?? 'placeholder-anon-key',
+  {
+    // Session conservée en localStorage + rafraîchie automatiquement : l'éditeur
+    // reste connecté entre les visites (sur la même URL) sans re-saisir.
+    auth: { persistSession: true, autoRefreshToken: true },
+  },
 )
