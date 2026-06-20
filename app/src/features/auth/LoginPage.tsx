@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from './useAuth'
+import { ROUTES } from '../../config/routes'
 
 // Page unique de connexion (/connexion). signInWithPassword → retour au site.
 export function LoginPage() {
@@ -11,7 +12,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  if (session) return <Navigate to="/" replace />
+  if (session) return <Navigate to={ROUTES.home} replace />
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -23,7 +24,7 @@ export function LoginPage() {
       setError('Identifiants incorrects.')
       return
     }
-    navigate('/', { replace: true })
+    navigate(ROUTES.home, { replace: true })
   }
 
   return (

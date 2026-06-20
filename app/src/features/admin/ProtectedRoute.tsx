@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { useAuth } from '../auth/useAuth'
+import { useAuth } from '../auth'
+import { ROUTES } from '../../config/routes'
 
 const screen: React.CSSProperties = {
   minHeight: '100vh',
@@ -16,7 +17,7 @@ const screen: React.CSSProperties = {
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, role, loading } = useAuth()
   if (loading) return <div style={screen}>…</div>
-  if (!session) return <Navigate to="/connexion" replace />
+  if (!session) return <Navigate to={ROUTES.login} replace />
   if (!role) return <div style={screen}>…</div> // rôle en cours de résolution
   if (role !== 'admin' && role !== 'super_admin') return <Navigate to="/" replace />
   return <>{children}</>

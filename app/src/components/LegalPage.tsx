@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Logo } from './Logo'
+import { ROUTES } from '../config/routes'
+import { LEGAL_IDS } from '../config/ids'
 
 // Marqueur visible des informations restant à compléter (page de test).
 const Todo = ({ t = 'À COMPLÉTER' }: { t?: string }) => <span className="legal-todo">[{t}]</span>
@@ -20,14 +22,14 @@ export function LegalPage() {
     <main className="legal-page">
       <header className="legal-top">
         <div className="wrap legal-top-inner">
-          <Link className="brand" to="/" aria-label="Retour à l'accueil">
+          <Link className="brand" to={ROUTES.home} aria-label="Retour à l'accueil">
             <Logo />
             <div>
               <b>TCM Agencement</b>
               <span>Menuiserie · Lorient</span>
             </div>
           </Link>
-          <Link className="legal-back" to="/">
+          <Link className="legal-back" to={ROUTES.home}>
             ← Retour au site
           </Link>
         </div>
@@ -38,13 +40,13 @@ export function LegalPage() {
         <h1>Mentions légales · Politique de confidentialité (RGPD) · Politique de cookies</h1>
 
         <nav className="legal-nav">
-          <a href="#mentions">Mentions légales</a>
-          <a href="#confidentialite">Confidentialité (RGPD)</a>
-          <a href="#cookies">Cookies</a>
+          <a href={`#${LEGAL_IDS.mentions}`}>Mentions légales</a>
+          <a href={`#${LEGAL_IDS.confidentialite}`}>Confidentialité (RGPD)</a>
+          <a href={`#${LEGAL_IDS.cookies}`}>Cookies</a>
         </nav>
 
         {/* 1. MENTIONS LÉGALES */}
-        <section id="mentions">
+        <section id={LEGAL_IDS.mentions}>
           <h2>1. Mentions légales</h2>
 
           <h3>Éditeur du site</h3>
@@ -183,7 +185,7 @@ export function LegalPage() {
         </section>
 
         {/* 4. CONFIDENTIALITÉ RGPD */}
-        <section id="confidentialite">
+        <section id={LEGAL_IDS.confidentialite}>
           <h2>4. Politique de confidentialité — RGPD</h2>
 
           <h3>Responsable du traitement</h3>
@@ -311,7 +313,7 @@ export function LegalPage() {
         </section>
 
         {/* 5. COOKIES */}
-        <section id="cookies">
+        <section id={LEGAL_IDS.cookies}>
           <h2>5. Politique de cookies</h2>
 
           <h3>Utilisation des cookies</h3>

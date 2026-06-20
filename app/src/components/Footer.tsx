@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom'
-import { useContent } from '../features/content/useContent'
-import { EditableText } from '../features/edit/EditableText'
+import { useContent } from '../features/content'
+import { EditableText } from '../features/edit'
 import { Logo } from './Logo'
+import { ROUTES } from '../config/routes'
+import { LEGAL_IDS } from '../config/ids'
 
 // Liens « Accès » historiquement en placeholder `#` → vraies routes de l'app.
 const ROUTE_FOR_LABEL: Record<string, string> = {
-  Connexion: '/connexion',
-  'Espace administrateur': '/admin/messages',
-  'Mentions légales': '/mentions-legales',
+  Connexion: ROUTES.login,
+  'Espace administrateur': ROUTES.adminMessages,
+  'Mentions légales': ROUTES.legal,
 }
 const resolveHref = (l: { label: string; href: string }) =>
   l.href && l.href !== '#' ? l.href : (ROUTE_FOR_LABEL[l.label] ?? l.href)
@@ -53,9 +55,9 @@ export function Footer() {
           ))}
           <div className="foot-col">
             <h4>Informations légales</h4>
-            <Link to="/mentions-legales">Mentions légales</Link>
-            <Link to="/mentions-legales#confidentialite">Politique de confidentialité</Link>
-            <Link to="/mentions-legales#cookies">Politique de cookies</Link>
+            <Link to={ROUTES.legal}>Mentions légales</Link>
+            <Link to={`${ROUTES.legal}#${LEGAL_IDS.confidentialite}`}>Politique de confidentialité</Link>
+            <Link to={`${ROUTES.legal}#${LEGAL_IDS.cookies}`}>Politique de cookies</Link>
           </div>
         </div>
         <div className="foot-bottom">

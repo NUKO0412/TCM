@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useEditMode } from './useEditMode'
-import { useStore } from '../content/useStore'
+import { useStore } from '../content'
 
 type Bind =
   | { sectionKey: string; path: string }

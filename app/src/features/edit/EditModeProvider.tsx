@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { useAuth } from '../auth/useAuth'
+import { useAuth } from '../auth'
 import { EditContext } from './edit-context'
 
 // canEdit = connecté avec un rôle éditeur (admin/super_admin, droits identiques).

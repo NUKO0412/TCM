@@ -1,7 +1,6 @@
 import { Children, cloneElement, Fragment, useState, type ReactElement } from 'react'
 import { useEditMode } from './useEditMode'
-import { useStore } from '../content/useStore'
-import type { StoreItem } from '../content/store-context'
+import { useStore, type StoreItem } from '../content'
 
 type Props = {
   collection: string

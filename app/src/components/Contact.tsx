@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { useContent } from '../features/content/useContent'
-import { useEditMode } from '../features/edit/useEditMode'
-import { EditableText } from '../features/edit/EditableText'
-import { submitContactRequest } from '../features/contact/submit'
+import { useContent } from '../features/content'
+import { EditableText, useEditMode } from '../features/edit'
+import { submitContactRequest } from '../features/contact'
 import { Icon } from './IconDefs'
 
 // Téléphone -> lien d'appel, email -> lien mail (cliquables hors édition).

@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { useContent } from '../features/content/useContent'
-import { useAuth } from '../features/auth/useAuth'
+import { useContent } from '../features/content'
+import { useAuth } from '../features/auth'
 import { Logo } from './Logo'
 import { Icon } from './IconDefs'
+import { ROUTES } from '../config/routes'
 
 const roleLabel = (role: string | null) =>
   role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : ''
@@ -39,7 +40,7 @@ export function Header() {
               {role && <span className="role-tag">{roleLabel(role)}</span>}
             </>
           ) : (
-            <Link className="btn-login" to="/connexion">
+            <Link className="btn-login" to={ROUTES.login}>
               <Icon name="i-lock" style={{ width: 15, height: 15 }} /> {loginLabel}
             </Link>
           )}

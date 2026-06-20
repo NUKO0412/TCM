@@ -1,7 +1,5 @@
-import { useContent } from '../features/content/useContent'
-import { useStore } from '../features/content/useStore'
-import { EditableText } from '../features/edit/EditableText'
-import { EditableImage } from '../features/edit/EditableImage'
+import { useContent, useStore } from '../features/content'
+import { EditableImage, EditableText } from '../features/edit'
 
 export function About() {
   const { eyebrow, heading, paragraph, feats, figure } = useContent().about

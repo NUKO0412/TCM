@@ -1,6 +1,5 @@
-import { useContent } from '../features/content/useContent'
-import { EditableText } from '../features/edit/EditableText'
-import { EditableList } from '../features/edit/EditableList'
+import { useContent } from '../features/content'
+import { EditableList, EditableText } from '../features/edit'
 import { Icon } from './IconDefs'
 
 const s = (v: unknown) => (typeof v === 'string' ? v : '')

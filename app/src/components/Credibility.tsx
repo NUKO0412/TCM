@@ -1,5 +1,4 @@
-import { EditableList } from '../features/edit/EditableList'
-import { EditableText } from '../features/edit/EditableText'
+import { EditableList, EditableText } from '../features/edit'
 
 const s = (v: unknown) => (typeof v === 'string' ? v : '')
 
