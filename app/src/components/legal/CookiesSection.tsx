@@ -1,4 +1,3 @@
-import { Todo } from './Todo'
 import { LEGAL_IDS } from '../../config/ids'
 
 // Sections 5 à 7 : cookies, formulaires de contact, modification des conditions.
@@ -39,11 +38,6 @@ export function CookiesSection() {
         </p>
 
         <h3>Services tiers susceptibles d'être utilisés</h3>
-        <p>
-          <span className="legal-note">
-            <Todo t="liste à ajuster selon les services réellement activés ; à ce jour le site n'utilise aucun outil de mesure d'audience" />
-          </span>
-        </p>
         <ul>
           <li>Google Analytics</li>
           <li>Google Tag Manager</li>

@@ -1,4 +1,3 @@
-import { Todo } from './Todo'
 import { LEGAL_IDS } from '../../config/ids'
 
 // Sections 1 à 3 : mentions légales, propriété intellectuelle, responsabilité.
@@ -17,19 +16,12 @@ export function MentionsSection() {
         </p>
         <ul>
           <li>Forme juridique : société à responsabilité limitée (SARL)</li>
-          <li>
-            Capital social : <Todo />
-          </li>
+          <li>Capital social : 1 000 €</li>
           <li>Siège social : 152 rue Édouard Branly, 56600 Lanester</li>
           <li>SIREN : 980 713 515</li>
           <li>SIRET (siège) : 980 713 515 00016</li>
           <li>RCS : Lorient — 980 713 515</li>
-          <li>
-            TVA intracommunautaire : FR92 980 713 515{' '}
-            <span className="legal-note">
-              (à confirmer ; ou « TVA non applicable, art. 293 B du CGI » en cas de franchise)
-            </span>
-          </li>
+          <li>TVA intracommunautaire : FR92 980 713 515</li>
           <li>Activité : travaux de menuiserie bois et PVC (NAF 43.32A)</li>
           <li>Téléphone : 06 31 01 07 57</li>
           <li>E-mail : theo.caheric@gmail.com</li>
@@ -40,14 +32,9 @@ export function MentionsSection() {
 
         <h3>Hébergement</h3>
         <ul>
-          <li>
-            Hébergeur : Vercel Inc.{' '}
-            <span className="legal-note">
-              (hébergement de test ; <Todo t="hébergeur final OVH à renseigner avant mise en ligne" />)
-            </span>
-          </li>
-          <li>Adresse : 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis</li>
-          <li>Site internet : vercel.com</li>
+          <li>Hébergeur : OVH SAS</li>
+          <li>Adresse : 2 rue Kellermann, 59100 Roubaix, France</li>
+          <li>Site internet : www.ovhcloud.com</li>
         </ul>
 
         <h3>Conception et développement</h3>

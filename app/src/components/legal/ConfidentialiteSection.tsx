@@ -1,4 +1,3 @@
-import { Todo } from './Todo'
 import { LEGAL_IDS } from '../../config/ids'
 
 // Section 4 : politique de confidentialité (RGPD). Ancre #confidentialite.
@@ -118,10 +117,7 @@ export function ConfidentialiteSection() {
         <li>D'un droit de retrait du consentement</li>
       </ul>
       <p>
-        Toute demande peut être adressée à : <strong>theo.caheric@gmail.com</strong>{' '}
-        <span className="legal-note">
-          (<Todo t="adresse e-mail dédiée RGPD si souhaitée" />)
-        </span>
+        Toute demande peut être adressée à : <strong>theo.caheric@gmail.com</strong>
       </p>
 
       <h3>Réclamation</h3>

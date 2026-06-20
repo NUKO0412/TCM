@@ -201,8 +201,6 @@ footer{background:#100E0A;border-top:1px solid var(--line-d);padding:64px 0 34px
 .legal-doc li{position:relative;color:#D8CFBC;font-size:15px;line-height:1.7;padding-left:20px;margin:6px 0}
 .legal-doc li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--oak)}
 .legal-doc a{color:var(--oak-2);text-decoration:underline;text-underline-offset:2px}
-.legal-note{color:var(--muted);font-size:13px}
-.legal-todo{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:#E0A86A;background:rgba(224,168,106,.1);border:1px solid rgba(224,168,106,.32);border-radius:5px;padding:1px 7px}
 
 /* svg icon sizing */
 svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
