@@ -22,10 +22,16 @@ export function useReveal() {
     )
 
     document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
-      const sibs = [...(el.parentElement?.children ?? [])].filter((c) =>
-        c.classList.contains('reveal'),
+      const sibs = [...(el.parentElement?.children ?? [])].filter(
+        (c): c is HTMLElement => c.classList.contains('reveal'),
       )
-      el.dataset.d = String((sibs.indexOf(el) % 6) * 70)
+      // Décalage en cascade. En grille, les cartes d'une même rangée (même
+      // offsetTop) entrent ensemble : on décale par COLONNE, réinitialisé à
+      // chaque rangée — sinon la 2e rangée attend trop (210-350 ms) et « saute ».
+      // En pile (1 élément par rangée), on garde la cascade par index d'origine.
+      const rowMates = sibs.filter((c) => Math.abs(c.offsetTop - el.offsetTop) < 4)
+      const i = rowMates.length > 1 ? rowMates.indexOf(el) : sibs.indexOf(el)
+      el.dataset.d = String((i % 6) * 70)
       io.observe(el)
     })
 
