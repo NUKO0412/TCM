@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 
-// Réplique fidèle du script reveal d'origine :
+// Effet d'apparition au scroll :
 // - décalage = (index parmi les voisins .reveal % 6) × 70 ms
-// - IntersectionObserver seuil 0.12, ajoute .in puis arrête d'observer
-// - repli à 300 ms pour les éléments déjà visibles au chargement
+// - rootMargin bas négatif : l'anim part quand l'élément est entré d'~20 % dans
+//   l'écran (pas au ras du bas), pour qu'on ait le temps de la voir
+// - repli au chargement : seulement pour ce qui est franchement visible (< 80 % h)
 export function useReveal() {
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -17,7 +18,7 @@ export function useReveal() {
           }
         })
       },
-      { threshold: 0.12 },
+      { threshold: 0.12, rootMargin: '0px 0px -20% 0px' },
     )
 
     document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
@@ -31,7 +32,7 @@ export function useReveal() {
     const t = setTimeout(() => {
       document.querySelectorAll<HTMLElement>('.reveal:not(.in)').forEach((el) => {
         const r = el.getBoundingClientRect()
-        if (r.top < innerHeight) el.classList.add('in')
+        if (r.top < innerHeight * 0.8) el.classList.add('in')
       })
     }, 300)
 
