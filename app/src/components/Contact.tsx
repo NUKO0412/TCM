@@ -96,7 +96,7 @@ export function Contact() {
           </div>
         </div>
 
-        <form className="form reveal" onSubmit={onSubmit}>
+        <form className="form" onSubmit={onSubmit}>
             <div className="row">
               <div className="field">
                 <label>Nom</label>
