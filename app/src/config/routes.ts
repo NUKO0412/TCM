@@ -5,4 +5,5 @@ export const ROUTES = {
   legal: '/mentions-legales',
   login: '/connexion',
   adminMessages: '/admin/messages',
+  adminSeo: '/admin/seo',
 } as const

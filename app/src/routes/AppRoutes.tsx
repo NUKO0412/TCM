@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Site } from '../Site'
 import { LegalPage } from '../components/LegalPage'
 import { LoginPage } from '../features/auth'
-import { MessagesPage, ProtectedRoute } from '../features/admin'
+import { MessagesPage, SeoPage, ProtectedRoute } from '../features/admin'
 import { ROUTES } from '../config/routes'
 
 export function AppRoutes() {
@@ -16,6 +16,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <MessagesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.adminSeo}
+        element={
+          <ProtectedRoute>
+            <SeoPage />
           </ProtectedRoute>
         }
       />

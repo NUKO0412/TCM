@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth'
+import { ROUTES } from '../../config/routes'
 import { useContactRequests, type ContactRequest } from './useContactRequests'
 
 export function MessagesPage() {
@@ -21,7 +22,10 @@ export function MessagesPage() {
             {unread > 0 && <span style={badge}>{unread} non lu{unread > 1 ? 's' : ''}</span>}
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Link className="btn-login" to={ROUTES.adminSeo}>
+            SEO
+          </Link>
           <Link className="btn-login" to="/">
             ← Site
           </Link>
