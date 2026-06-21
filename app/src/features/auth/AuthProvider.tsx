@@ -8,16 +8,21 @@ import { AuthContext, type Role } from './auth-context'
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [role, setRole] = useState<Role | null>(null)
+  const [roleResolved, setRoleResolved] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // Récupère le rôle du compte connecté (ou null).
+  // Récupère le rôle du compte connecté (ou null). roleResolved distingue
+  // « rôle pas encore récupéré » de « rôle récupéré = aucun » (non-admin).
   const loadRole = useCallback(async (s: Session | null) => {
+    setRoleResolved(false)
     if (!s) {
       setRole(null)
+      setRoleResolved(true)
       return
     }
     const { data } = await supabase.from('profiles').select('role').eq('id', s.user.id).maybeSingle()
     setRole((data?.role as Role | undefined) ?? null)
+    setRoleResolved(true)
   }, [])
 
   useEffect(() => {
@@ -43,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ session, role, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, role, roleResolved, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

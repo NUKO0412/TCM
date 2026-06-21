@@ -15,10 +15,10 @@ const screen: React.CSSProperties = {
 
 // Route réservée aux éditeurs (admin/super_admin). Sinon → /connexion.
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { session, role, loading } = useAuth()
+  const { session, role, roleResolved, loading } = useAuth()
   if (loading) return <div style={screen}>…</div>
   if (!session) return <Navigate to={ROUTES.login} replace />
-  if (!role) return <div style={screen}>…</div> // rôle en cours de résolution
+  if (!roleResolved) return <div style={screen}>…</div> // rôle en cours de résolution
   if (role !== 'admin' && role !== 'super_admin') return <Navigate to="/" replace />
   return <>{children}</>
 }

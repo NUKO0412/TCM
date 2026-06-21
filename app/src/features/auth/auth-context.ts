@@ -6,6 +6,7 @@ export type Role = 'admin' | 'super_admin'
 export interface AuthState {
   session: Session | null
   role: Role | null
+  roleResolved: boolean
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
