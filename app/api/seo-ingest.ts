@@ -47,7 +47,8 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_KEY
+  // la clé service est câblée selon le projet sous l'un ou l'autre nom
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!supabaseUrl || !serviceKey) return reply(500, { error: 'server_misconfigured' })
 
   const data: Record<string, unknown> = { title: body.title, description: body.description }
