@@ -30,6 +30,11 @@ export function Contact() {
     try {
       await submitContactRequest(form)
       setStatus('sent')
+      // « Demande envoyée » sur le bouton ~3 s, puis on vide le formulaire.
+      setTimeout(() => {
+        setForm({ ...empty, type_projet: projectTypes[0] ?? '' })
+        setStatus('idle')
+      }, 3000)
     } catch (err) {
       console.error('contact submit', err)
       setStatus('error')
@@ -91,15 +96,7 @@ export function Contact() {
           </div>
         </div>
 
-        {status === 'sent' ? (
-          <div className="form reveal" role="status">
-            <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, marginBottom: 10 }}>Demande envoyée.</h3>
-            <p style={{ color: '#D8CFBC', fontSize: 15 }}>
-              Merci, votre demande a bien été enregistrée. On vous recontacte rapidement.
-            </p>
-          </div>
-        ) : (
-          <form className="form reveal" onSubmit={onSubmit}>
+        <form className="form reveal" onSubmit={onSubmit}>
             <div className="row">
               <div className="field">
                 <label>Nom</label>
@@ -176,8 +173,8 @@ export function Contact() {
                 onChange={set('message')}
               />
             </div>
-            <button className="btn btn-primary" type="submit" disabled={status === 'sending'}>
-              {status === 'sending' ? 'Envoi…' : submitLabel}{' '}
+            <button className="btn btn-primary" type="submit" disabled={status === 'sending' || status === 'sent'}>
+              {status === 'sending' ? 'Envoi…' : status === 'sent' ? 'Demande envoyée' : submitLabel}{' '}
               <span className="ic">
                 <Icon name="i-send" className="" />
               </span>
@@ -188,7 +185,6 @@ export function Contact() {
               </div>
             )}
           </form>
-        )}
       </div>
     </section>
   )
