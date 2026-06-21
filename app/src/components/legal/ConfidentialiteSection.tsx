@@ -9,7 +9,7 @@ export function ConfidentialiteSection() {
       <h3>Responsable du traitement</h3>
       <p>Le responsable du traitement des données personnelles est :</p>
       <p>
-        <strong>TCM Agencements</strong>
+        <strong>TCM Agencement</strong>
       </p>
       <ul>
         <li>Adresse : 152 rue Édouard Branly, 56600 Lanester</li>

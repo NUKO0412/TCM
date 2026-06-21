@@ -12,7 +12,7 @@ export function MentionsSection() {
         <h3>Éditeur du site</h3>
         <p>Le présent site est édité par :</p>
         <p>
-          <strong>TCM Agencements</strong>
+          <strong>TCM Agencement</strong>
         </p>
         <ul>
           <li>Forme juridique : société à responsabilité limitée (SARL)</li>
