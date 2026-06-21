@@ -52,10 +52,14 @@ function readCookie(request: Request, name: string) {
 }
 
 export default async function middleware(request: Request) {
+  const url = new URL(request.url)
+
+  // /api/* (point de réception SEO) ne passe pas par le mot de passe : il a sa propre clé.
+  if (url.pathname.startsWith('/api/')) return next()
+
   const expected = process.env.SITE_PASSWORD
   if (!expected) return next() // pas de protection tant que SITE_PASSWORD non défini
 
-  const url = new URL(request.url)
   if (url.pathname === '/__tcm_access' && request.method === 'POST') {
     const data = await request.formData()
     if (String(data.get('password') ?? '') === expected) {
