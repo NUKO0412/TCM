@@ -28,6 +28,12 @@ function reply(status: number, body: Record<string, unknown>): Response {
   })
 }
 
+// Garde d'origine : l'endpoint n'est appelé que par le formulaire du site.
+// On refuse tout appel dont l'Origin/Referer n'est pas le domaine TCM.
+const ALLOWED_HOST = 'tcmagencement.fr'
+const hostOf = (v: string): string => { try { return new URL(v).host } catch { return '' } }
+const allowedHost = (h: string): boolean => h === ALLOWED_HOST || h.endsWith('.' + ALLOWED_HOST)
+
 const isText = (v: unknown): v is string => typeof v === 'string' && v.trim() !== ''
 const isEmail = (v: unknown): v is string => typeof v === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 const esc = (s: string) =>
@@ -49,6 +55,14 @@ async function sendEmail(
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return reply(405, { error: 'method_not_allowed' })
+
+  // Refuse les appels d'une origine étrangère (anti-déclenchement cross-site).
+  // Si Origin est présent il fait foi ; sinon on retombe sur Referer ; si aucun
+  // des deux n'est présent, on laisse passer (anti-rejeu + UUID protègent déjà).
+  const origin = request.headers.get('origin')
+  const referer = request.headers.get('referer')
+  if (origin && !allowedHost(hostOf(origin))) return reply(403, { error: 'forbidden_origin' })
+  if (!origin && referer && !allowedHost(hostOf(referer))) return reply(403, { error: 'forbidden_origin' })
 
   let body: { id?: unknown }
   try {
