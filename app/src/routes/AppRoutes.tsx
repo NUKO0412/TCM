@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
-import { ProtectedRoute } from '../features/admin/ProtectedRoute'
+import { ProtectedRoute } from '../features/admin'
 import { ROUTES } from '../config/routes'
 
 // Chargement à la demande : chaque page est un chunk séparé (allège le bundle initial).
