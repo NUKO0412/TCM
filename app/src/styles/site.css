@@ -314,7 +314,7 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 @media(max-width:820px){
   .menu{display:none}
   .link-cta{min-height:44px}
-  .burger{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line-d);border-radius:8px;color:var(--cream)}
+  .burger{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line-d);border-radius:8px;color:var(--cream);background:transparent;cursor:pointer;padding:0}
   .steps{grid-template-columns:repeat(2,1fr)}
   .hero-inner{padding-bottom:64px}
   .figure .tag{position:static;margin-top:14px;max-width:none}
