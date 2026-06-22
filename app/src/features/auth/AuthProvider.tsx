@@ -21,22 +21,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoleResolved(true)
       return
     }
-    const { data } = await supabase.from('profiles').select('role').eq('id', s.user.id).maybeSingle()
-    setRole((data?.role as Role | undefined) ?? null)
-    setRoleResolved(true)
+    try {
+      const { data } = await supabase.from('profiles').select('role').eq('id', s.user.id).maybeSingle()
+      setRole((data?.role as Role | undefined) ?? null)
+    } catch {
+      setRole(null)
+    } finally {
+      setRoleResolved(true)
+    }
   }, [])
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session)
-      await loadRole(data.session)
-      setLoading(false)
-    })
+    let mounted = true
+    supabase.auth
+      .getSession()
+      .then(async ({ data }) => {
+        if (!mounted) return
+        setSession(data.session)
+        await loadRole(data.session)
+      })
+      .catch(async () => {
+        if (!mounted) return
+        setSession(null)
+        await loadRole(null)
+      })
+      .finally(() => {
+        if (mounted) setLoading(false)
+      })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s)
       void loadRole(s)
     })
-    return () => sub.subscription.unsubscribe()
+    return () => {
+      mounted = false
+      sub.subscription.unsubscribe()
+    }
   }, [loadRole])
 
   const signIn = useCallback(async (email: string, password: string) => {

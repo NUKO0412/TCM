@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
 import { useAuth } from './useAuth'
 import { ROUTES } from '../../config/routes'
 
-const MIN_LENGTH = 8
+const MIN_LENGTH = 12
 
 // Page atterrissage du lien email « mot de passe oublié » (/reinitialisation).
 // Supabase, au retour, ouvre une session de récupération (detectSessionInUrl) :
@@ -15,9 +16,52 @@ export function ResetPasswordPage() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [recoveryState, setRecoveryState] = useState<'idle' | 'processing' | 'failed'>('idle')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+
+    if (!accessToken || !refreshToken) return
+
+    let cancelled = false
+    setRecoveryState('processing')
+
+    supabase.auth
+      .setSession({ access_token: accessToken, refresh_token: refreshToken })
+      .then(({ error }) => {
+        if (cancelled) return
+        if (error) {
+          setError('Le lien de réinitialisation est invalide, expiré ou déjà utilisé.')
+          setRecoveryState('failed')
+          return
+        }
+        window.history.replaceState(null, '', window.location.pathname)
+        setRecoveryState('idle')
+      })
+      .catch(() => {
+        if (cancelled) return
+        setError('Impossible de préparer la réinitialisation. Demandez un nouveau lien.')
+        setRecoveryState('failed')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Tant que la session de récupération n'est pas résolue, on patiente.
-  if (loading) return <main style={wrap}><p style={muted}>…</p></main>
+  if (loading || recoveryState === 'processing') {
+    return (
+      <main style={wrap}>
+        <div className="form" style={card}>
+          <h1 style={title}>Préparation du mot de passe</h1>
+          <p style={muted}>Vérification du lien sécurisé…</p>
+        </div>
+      </main>
+    )
+  }
 
   // Pas de session = lien absent, déjà utilisé ou expiré.
   if (!session) {
@@ -26,8 +70,8 @@ export function ResetPasswordPage() {
         <div className="form" style={card}>
           <h1 style={title}>Lien invalide ou expiré</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 18 }}>
-            Le lien de réinitialisation n’est plus valable. Demandez-en un nouveau depuis la page de
-            connexion.
+            {error ??
+              'Le lien de réinitialisation n’est plus valable. Demandez-en un nouveau depuis la page de connexion.'}
           </p>
           <Link className="btn btn-primary" to={ROUTES.login}>
             Aller à la connexion
@@ -71,12 +115,23 @@ export function ResetPasswordPage() {
           Espace administrateur
         </span>
         <h1 style={title}>Nouveau mot de passe</h1>
+        <input
+          type="email"
+          name="username"
+          autoComplete="username"
+          value={session.user?.email ?? ''}
+          readOnly
+          hidden
+        />
         <div className="field">
           <label>Nouveau mot de passe</label>
           <input
             type="password"
             name="new-password"
+            id="new-password"
             autoComplete="new-password"
+            minLength={MIN_LENGTH}
+            placeholder="Créer un mot de passe fort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -87,12 +142,19 @@ export function ResetPasswordPage() {
           <input
             type="password"
             name="confirm-password"
+            id="confirm-password"
             autoComplete="new-password"
+            minLength={MIN_LENGTH}
+            placeholder="Confirmer le mot de passe"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             required
           />
         </div>
+        <p style={hint}>
+          Utilisez un mot de passe long. Firefox peut proposer et enregistrer un mot de passe fort sur
+          ces champs.
+        </p>
         {error && <p style={{ color: '#e0a070', fontSize: 13, marginBottom: 12 }}>{error}</p>}
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {busy ? 'Enregistrement…' : 'Définir le mot de passe'}
@@ -119,3 +181,10 @@ const title: React.CSSProperties = {
 }
 
 const muted: React.CSSProperties = { color: 'var(--muted)', fontFamily: 'var(--mono)', fontSize: 13 }
+
+const hint: React.CSSProperties = {
+  color: 'var(--muted)',
+  fontSize: 13,
+  lineHeight: 1.5,
+  margin: '-4px 0 14px',
+}

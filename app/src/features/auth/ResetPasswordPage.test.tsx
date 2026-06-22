@@ -51,15 +51,15 @@ describe('ResetPasswordPage', () => {
     fireEvent.change(field('new-password'), { target: { value: 'court' } })
     fireEvent.change(field('confirm-password'), { target: { value: 'court' } })
     fireEvent.click(screen.getByRole('button', { name: 'Définir le mot de passe' }))
-    expect(await screen.findByText(/au moins 8 caractères/)).toBeInTheDocument()
+    expect(await screen.findByText(/au moins 12 caractères/)).toBeInTheDocument()
     expect(base.updatePassword).not.toHaveBeenCalled()
   })
 
   it('refuse deux mots de passe différents', async () => {
     mockAuth.mockReturnValue({ ...base, session: {} as never })
     const { field } = renderReset()
-    fireEvent.change(field('new-password'), { target: { value: 'motdepasse1' } })
-    fireEvent.change(field('confirm-password'), { target: { value: 'motdepasse2' } })
+    fireEvent.change(field('new-password'), { target: { value: 'motdepasse-111' } })
+    fireEvent.change(field('confirm-password'), { target: { value: 'motdepasse-222' } })
     fireEvent.click(screen.getByRole('button', { name: 'Définir le mot de passe' }))
     expect(await screen.findByText(/ne correspondent pas/)).toBeInTheDocument()
     expect(base.updatePassword).not.toHaveBeenCalled()
