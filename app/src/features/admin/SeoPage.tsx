@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { business } from '../../config/business'
 import { ROUTES } from '../../config/routes'
 import { useSeo } from './useSeo'
 
@@ -61,18 +60,21 @@ export function SeoPage() {
 
           <div style={{ display: 'grid', gap: 10 }}>
             <FieldBlock label="Titre" value={seo?.title} />
+            <FieldBlock label="H1" value={seo?.h1} />
             <FieldBlock label="Description" value={seo?.description} />
             <KeywordsBlock keywords={seo?.keywords} />
             <FieldBlock label="OG · titre" value={seo?.og?.title} />
             <FieldBlock label="OG · description" value={seo?.og?.description} />
-            <FieldBlock label="OG · image" value={seo?.og?.image ?? business.ogImage} mono />
+            <FieldBlock label="OG · image" value={seo?.og?.image} mono />
+            <FieldBlock label="Données structurées" value={seo?.structuredData ? 'reçues par injection' : undefined} />
+            <SearchConsoleBlock data={seo?.searchConsole} />
           </div>
 
           {role === 'super_admin' && (
             <div style={{ ...card, padding: 16, marginTop: 20 }}>
               <div style={label}>Intégration · super-admin</div>
               <div style={{ marginTop: 12, display: 'grid', gap: 14 }}>
-                <FieldBlock label="Point de réception" value={`${business.url}/api/seo-ingest`} mono flat />
+                <FieldBlock label="Point de réception" value="https://www.tcmagencement.fr/api/seo-ingest" mono flat />
                 <FieldBlock label="Méthode" value="POST · en-tête Authorization: Bearer <clé>" mono flat />
                 <div>
                   <div style={label}>Clé API</div>
@@ -86,6 +88,34 @@ export function SeoPage() {
         </>
       )}
     </main>
+  )
+}
+
+function SearchConsoleBlock({ data }: { data?: NonNullable<import('../../config/business').SeoData['searchConsole']> }) {
+  const indexed =
+    data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
+  return (
+    <div style={{ ...card, padding: 16 }}>
+      <div style={label}>Google Search Console</div>
+      <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+        <FieldBlock label="Statut" value={indexed} flat />
+        <FieldBlock label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} flat />
+        <FieldBlock label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} flat />
+        <FieldBlock label="Position moyenne" value={data?.position == null ? undefined : String(data.position)} flat />
+        {data?.topQueries?.length ? (
+          <div>
+            <div style={label}>Top requêtes</div>
+            <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
+              {data.topQueries.map((q) => (
+                <div key={q.query} style={{ fontSize: 13, color: '#E5DCC9', fontFamily: 'var(--mono)' }}>
+                  {q.query} · {q.clicks ?? 0} clic(s) · {q.impressions ?? 0} impression(s)
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
   )
 }
 

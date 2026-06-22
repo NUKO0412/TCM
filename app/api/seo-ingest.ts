@@ -7,8 +7,11 @@ type Incoming = {
   page?: unknown
   title?: unknown
   description?: unknown
+  h1?: unknown
   keywords?: unknown
   og?: unknown
+  structuredData?: unknown
+  searchConsole?: unknown
 }
 
 function reply(status: number, body: Record<string, unknown>): Response {
@@ -45,6 +48,15 @@ export default async function handler(request: Request): Promise<Response> {
   if (body.og !== undefined && !isPlainObject(body.og)) {
     return reply(400, { error: 'og_must_be_object' })
   }
+  if (body.h1 !== undefined && !isText(body.h1)) {
+    return reply(400, { error: 'h1_must_be_text' })
+  }
+  if (body.structuredData !== undefined && !isPlainObject(body.structuredData)) {
+    return reply(400, { error: 'structuredData_must_be_object' })
+  }
+  if (body.searchConsole !== undefined && !isPlainObject(body.searchConsole)) {
+    return reply(400, { error: 'searchConsole_must_be_object' })
+  }
 
   const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
   // la clé service est câblée selon le projet sous l'un ou l'autre nom
@@ -52,8 +64,11 @@ export default async function handler(request: Request): Promise<Response> {
   if (!supabaseUrl || !serviceKey) return reply(500, { error: 'server_misconfigured' })
 
   const data: Record<string, unknown> = { title: body.title, description: body.description }
+  if (body.h1 !== undefined) data.h1 = body.h1
   if (body.keywords !== undefined) data.keywords = body.keywords
   if (body.og !== undefined) data.og = body.og
+  if (body.structuredData !== undefined) data.structuredData = body.structuredData
+  if (body.searchConsole !== undefined) data.searchConsole = body.searchConsole
 
   const upsert = await fetch(`${supabaseUrl}/rest/v1/seo?on_conflict=page`, {
     method: 'POST',
