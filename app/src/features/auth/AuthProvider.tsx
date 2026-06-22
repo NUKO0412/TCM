@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
+import { ROUTES } from '../../config/routes'
 import { AuthContext, type Role } from './auth-context'
 
 // Gère la session Supabase et résout le rôle depuis la table profiles.
@@ -47,8 +48,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
   }, [])
 
+  // « Mot de passe oublié » : Supabase envoie un email dont le lien ramène sur
+  // /reinitialisation (page qui exploite la session de récupération créée au retour).
+  const resetPassword = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}${ROUTES.resetPassword}`,
+    })
+    return { error: error?.message ?? null }
+  }, [])
+
+  // Définit le nouveau mot de passe du compte courant (session de récupération
+  // ou session normale). Utilisé par la page /reinitialisation.
+  const updatePassword = useCallback(async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password })
+    return { error: error?.message ?? null }
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ session, role, roleResolved, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ session, role, roleResolved, loading, signIn, signOut, resetPassword, updatePassword }}
+    >
       {children}
     </AuthContext.Provider>
   )

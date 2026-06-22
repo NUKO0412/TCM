@@ -28,7 +28,7 @@ function renderGuard() {
   )
 }
 
-const base = { signIn: vi.fn(), signOut: vi.fn() }
+const base = { signIn: vi.fn(), signOut: vi.fn(), resetPassword: vi.fn(), updatePassword: vi.fn() }
 
 beforeEach(() => mockAuth.mockReset())
 

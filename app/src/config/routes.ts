@@ -4,6 +4,7 @@ export const ROUTES = {
   home: '/',
   legal: '/mentions-legales',
   login: '/connexion',
+  resetPassword: '/reinitialisation',
   adminMessages: '/admin/messages',
   adminSeo: '/admin/seo',
 } as const

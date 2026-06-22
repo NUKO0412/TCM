@@ -57,6 +57,13 @@ export default async function middleware(request: Request) {
   // /api/* (point de réception SEO) ne passe pas par le mot de passe : il a sa propre clé.
   if (url.pathname.startsWith('/api/')) return next()
 
+  // /reinitialisation est exempté du sas chantier : le lien email de récupération
+  // Supabase porte le jeton dans le fragment d'URL (#access_token=…), invisible du
+  // serveur et perdu lors de la redirection du sas. La page ne fait rien sans une
+  // session de récupération valide — aucune fuite. (Le sas SITE_PASSWORD reste actif
+  // partout ailleurs.)
+  if (url.pathname === '/reinitialisation') return next()
+
   const expected = process.env.SITE_PASSWORD
   if (!expected) return next() // pas de protection tant que SITE_PASSWORD non défini
 

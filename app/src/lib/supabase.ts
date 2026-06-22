@@ -23,6 +23,8 @@ export const supabase = createClient(
   {
     // Session conservée en localStorage + rafraîchie automatiquement : l'éditeur
     // reste connecté entre les visites (sur la même URL) sans re-saisir.
-    auth: { persistSession: true, autoRefreshToken: true },
+    // detectSessionInUrl : traite le jeton de récupération du lien email
+    // « mot de passe oublié » (événement PASSWORD_RECOVERY) sur /reinitialisation.
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
   },
 )
