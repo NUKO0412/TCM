@@ -181,7 +181,9 @@ function SwipeShot({ className, children }: { className: string; children: React
         start.current = null
       }}
       onClickCapture={(e) => {
-        if (swiped.current) {
+        // Après un swipe, on annule le clic qui ouvrirait l'aperçu — MAIS on laisse
+        // passer le clic qu'on envoie nous-mêmes sur la flèche (sinon le swipe s'annule).
+        if (swiped.current && !(e.target as HTMLElement).closest?.('.carousel-arrow')) {
           e.preventDefault()
           e.stopPropagation()
           swiped.current = false
