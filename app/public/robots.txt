@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /connexion
+Disallow: /reinitialisation
+
+Sitemap: https://www.tcmagencement.fr/sitemap.xml
