@@ -131,7 +131,6 @@ export function ResetPasswordPage() {
             id="new-password"
             autoComplete="new-password"
             minLength={MIN_LENGTH}
-            placeholder="Créer un mot de passe fort"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -145,7 +144,6 @@ export function ResetPasswordPage() {
             id="confirm-password"
             autoComplete="new-password"
             minLength={MIN_LENGTH}
-            placeholder="Confirmer le mot de passe"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             required
