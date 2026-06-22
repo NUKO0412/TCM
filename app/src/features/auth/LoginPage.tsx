@@ -15,6 +15,7 @@ export function LoginPage() {
   const [mode, setMode] = useState<'login' | 'forgot'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -89,14 +90,25 @@ export function LoginPage() {
         {mode === 'login' && (
           <div className="field">
             <label>Mot de passe</label>
-            <input
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div style={passwordField}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={passwordInput}
+                required
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                onClick={() => setShowPassword((visible) => !visible)}
+                style={eyeButton}
+              >
+                <EyeIcon crossed={showPassword} />
+              </button>
+            </div>
           </div>
         )}
 
@@ -157,4 +169,58 @@ const linkBtn: React.CSSProperties = {
   color: 'var(--muted)',
   cursor: 'pointer',
   font: 'inherit',
+}
+
+const passwordField: React.CSSProperties = {
+  position: 'relative',
+}
+
+const passwordInput: React.CSSProperties = {
+  paddingRight: 48,
+}
+
+const eyeButton: React.CSSProperties = {
+  position: 'absolute',
+  top: '50%',
+  right: 8,
+  transform: 'translateY(-50%)',
+  width: 34,
+  height: 34,
+  display: 'grid',
+  placeItems: 'center',
+  border: 0,
+  borderRadius: 6,
+  background: 'transparent',
+  color: 'var(--muted)',
+  cursor: 'pointer',
+  padding: 0,
+}
+
+function EyeIcon({ crossed }: { crossed: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+      <path
+        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {crossed && (
+        <path
+          d="M4 4l16 16"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  )
 }

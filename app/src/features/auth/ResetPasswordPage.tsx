@@ -14,6 +14,8 @@ export function ResetPasswordPage() {
   const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [recoveryState, setRecoveryState] = useState<'idle' | 'processing' | 'failed'>('idle')
@@ -125,29 +127,51 @@ export function ResetPasswordPage() {
         />
         <div className="field">
           <label>Nouveau mot de passe</label>
-          <input
-            type="password"
-            name="new-password"
-            id="new-password"
-            autoComplete="new-password"
-            minLength={MIN_LENGTH}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div style={passwordField}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="new-password"
+              id="new-password"
+              autoComplete="new-password"
+              minLength={MIN_LENGTH}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={passwordInput}
+              required
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              onClick={() => setShowPassword((visible) => !visible)}
+              style={eyeButton}
+            >
+              <EyeIcon crossed={showPassword} />
+            </button>
+          </div>
         </div>
         <div className="field">
           <label>Confirmer le mot de passe</label>
-          <input
-            type="password"
-            name="confirm-password"
-            id="confirm-password"
-            autoComplete="new-password"
-            minLength={MIN_LENGTH}
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-          />
+          <div style={passwordField}>
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              name="confirm-password"
+              id="confirm-password"
+              autoComplete="new-password"
+              minLength={MIN_LENGTH}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              style={passwordInput}
+              required
+            />
+            <button
+              type="button"
+              aria-label={showConfirm ? 'Masquer la confirmation' : 'Afficher la confirmation'}
+              onClick={() => setShowConfirm((visible) => !visible)}
+              style={eyeButton}
+            >
+              <EyeIcon crossed={showConfirm} />
+            </button>
+          </div>
         </div>
         <p style={hint}>
           Utilisez un mot de passe long. Firefox peut proposer et enregistrer un mot de passe fort sur
@@ -185,4 +209,58 @@ const hint: React.CSSProperties = {
   fontSize: 13,
   lineHeight: 1.5,
   margin: '-4px 0 14px',
+}
+
+const passwordField: React.CSSProperties = {
+  position: 'relative',
+}
+
+const passwordInput: React.CSSProperties = {
+  paddingRight: 48,
+}
+
+const eyeButton: React.CSSProperties = {
+  position: 'absolute',
+  top: '50%',
+  right: 8,
+  transform: 'translateY(-50%)',
+  width: 34,
+  height: 34,
+  display: 'grid',
+  placeItems: 'center',
+  border: 0,
+  borderRadius: 6,
+  background: 'transparent',
+  color: 'var(--muted)',
+  cursor: 'pointer',
+  padding: 0,
+}
+
+function EyeIcon({ crossed }: { crossed: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+      <path
+        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {crossed && (
+        <path
+          d="M4 4l16 16"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  )
 }
