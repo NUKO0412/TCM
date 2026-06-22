@@ -13,17 +13,26 @@
     />
     <style>
       :root {
-        --ink: #151319;
-        --card: #211d24;
-        --line: #38313a;
-        --text: #f7f2ec;
-        --muted: #c9bfb5;
-        --gold: #d7b46a;
+        --ink: #16140f;
+        --ink-2: #1e1a13;
+        --cream: #f4eddf;
+        --oak: #c2904b;
+        --oak-2: #d9ac63;
+        --muted: #b6ab94;
+        --muted-d: #6f6450;
+        --line-d: rgba(244, 237, 223, 0.13);
+        --serif: Fraunces, Georgia, serif;
+        --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --mono: "Space Mono", monospace;
         --warn: #e0a070;
       }
 
       * {
         box-sizing: border-box;
+      }
+
+      [hidden] {
+        display: none !important;
       }
 
       body {
@@ -32,68 +41,111 @@
         display: grid;
         place-items: center;
         background: var(--ink);
-        color: var(--text);
-        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--cream);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.6;
+        padding: 40px 18px;
       }
 
       main {
         width: 380px;
-        max-width: calc(100vw - 36px);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--card);
-        padding: 30px;
+        max-width: 100%;
+        border: 1px solid var(--line-d);
+        border-radius: 14px;
+        background: var(--ink-2);
+        padding: 34px;
       }
 
       .eyebrow {
-        color: var(--gold);
-        font-family: "Space Mono", monospace;
-        font-size: 11px;
+        color: var(--oak-2);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--mono);
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.18em;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 34px;
+        height: 1px;
+        background: var(--oak);
+        display: inline-block;
+        opacity: 0.8;
       }
 
       h1 {
-        margin: 14px 0 22px;
-        font-family: Fraunces, Georgia, serif;
+        margin: 14px 0 24px;
+        font-family: var(--serif);
         font-size: 30px;
         font-weight: 500;
+        line-height: 1.05;
+        letter-spacing: -0.015em;
+      }
+
+      form {
+        margin: 0;
+      }
+
+      .field {
+        margin-bottom: 16px;
       }
 
       label {
         display: block;
         margin: 0 0 8px;
         color: var(--muted);
-        font-size: 13px;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
       }
 
       input {
         width: 100%;
-        min-height: 48px;
-        margin: 0 0 16px;
-        border: 1px solid #4a414a;
+        border: 1px solid var(--line-d);
         border-radius: 8px;
-        background: #151319;
-        color: #fff;
-        font-size: 16px;
-        padding: 12px;
+        background: var(--ink);
+        color: var(--cream);
+        font-family: var(--sans);
+        font-size: 15px;
+        padding: 13px 15px;
+        transition:
+          border-color 0.3s,
+          background 0.3s;
       }
 
-      button,
-      a.button {
+      input:focus {
+        outline: none;
+        border-color: var(--oak);
+        background: #221d15;
+      }
+
+      button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 14px;
         width: 100%;
-        min-height: 48px;
+        margin-top: 8px;
         border: 0;
-        border-radius: 8px;
-        background: var(--gold);
+        border-radius: 6px;
+        background: var(--oak);
         color: #17120b;
         font-size: 15px;
-        font-weight: 700;
-        text-decoration: none;
+        font-weight: 500;
+        padding: 16px 26px;
         cursor: pointer;
+        transition:
+          background 0.3s,
+          transform 0.25s;
+      }
+
+      button:hover {
+        background: var(--oak-2);
       }
 
       button:disabled {
@@ -116,6 +168,20 @@
         color: var(--warn);
         font-size: 13px;
       }
+
+      .login-link {
+        display: inline-flex;
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 12px;
+        font-family: var(--mono);
+        letter-spacing: 0.04em;
+        text-decoration: none;
+      }
+
+      .login-link:hover {
+        color: var(--oak-2);
+      }
     </style>
   </head>
   <body>
@@ -126,24 +192,28 @@
       <form id="form" hidden>
         <input id="username" name="username" type="email" autocomplete="username" hidden readonly />
 
-        <label for="new-password">Nouveau mot de passe</label>
-        <input id="new-password" name="new-password" type="password" autocomplete="new-password" minlength="12" required />
+        <div class="field">
+          <label for="new-password">Nouveau mot de passe</label>
+          <input id="new-password" name="new-password" type="password" autocomplete="new-password" minlength="12" required />
+        </div>
 
-        <label for="confirm-password">Confirmer le mot de passe</label>
-        <input
-          id="confirm-password"
-          name="confirm-password"
-          type="password"
-          autocomplete="new-password"
-          minlength="12"
-          required
-        />
+        <div class="field">
+          <label for="confirm-password">Confirmer le mot de passe</label>
+          <input
+            id="confirm-password"
+            name="confirm-password"
+            type="password"
+            autocomplete="new-password"
+            minlength="12"
+            required
+          />
+        </div>
 
         <p class="hint">Utilisez un mot de passe long. Firefox peut proposer et enregistrer un mot de passe fort sur ces champs.</p>
         <p id="error" class="error" hidden></p>
         <button id="submit" type="submit">Définir le mot de passe</button>
       </form>
-      <a id="login" class="button" href="/connexion" hidden>Aller à la connexion</a>
+      <a id="login" class="login-link" href="/connexion" hidden>← Retour à la connexion</a>
     </main>
 
     <script type="module">
