@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useContent, useStore, type StoreItem } from '../features/content'
 import { EditableImage, EditableList, EditableText, useEditMode } from '../features/edit'
 import { uploadImage } from '../lib/storage'
@@ -151,6 +151,48 @@ function Carousel({
   )
 }
 
+// Glissement tactile (swipe) pour changer de photo sur mobile : on réutilise les
+// flèches existantes de la carte. Un vrai glissement annule l'ouverture de l'aperçu.
+function SwipeShot({ className, children }: { className: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const start = useRef<{ x: number; y: number } | null>(null)
+  const swiped = useRef(false)
+  return (
+    <div
+      ref={ref}
+      className={className}
+      onTouchStart={(e) => {
+        const t = e.touches[0]
+        start.current = { x: t.clientX, y: t.clientY }
+        swiped.current = false
+      }}
+      onTouchEnd={(e) => {
+        const s0 = start.current
+        if (!s0) return
+        const t = e.changedTouches[0]
+        const dx = t.clientX - s0.x
+        const dy = t.clientY - s0.y
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          swiped.current = true
+          ref.current
+            ?.querySelector<HTMLButtonElement>(dx < 0 ? '.carousel-arrow.next' : '.carousel-arrow.prev')
+            ?.click()
+        }
+        start.current = null
+      }}
+      onClickCapture={(e) => {
+        if (swiped.current) {
+          e.preventDefault()
+          e.stopPropagation()
+          swiped.current = false
+        }
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function Realisations() {
   const { eyebrow, heading, cta } = useContent().realisations
   const [preview, setPreview] = useState<{ images: Photo[]; index: number } | null>(null)
@@ -199,7 +241,7 @@ export function Realisations() {
           newItem={() => ({ span: 's-b', images: [{ src: '', alt: '' }], category: 'Catégorie', title: 'Nouveau' })}
         >
           {(item) => (
-            <div className={`shot ${s(item.data.span) || 's-b'} reveal`}>
+            <SwipeShot className={`shot ${s(item.data.span) || 's-b'} reveal`}>
               <Carousel item={item} onView={setPreview} />
               <div className="cap">
                 <span>
@@ -209,7 +251,7 @@ export function Realisations() {
                   <EditableText itemId={item.id} field="title" value={s(item.data.title)} />
                 </b>
               </div>
-            </div>
+            </SwipeShot>
           )}
         </EditableList>
       </div>

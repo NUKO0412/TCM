@@ -12,7 +12,7 @@ export function useReveal() {
         es.forEach((e) => {
           if (e.isIntersecting) {
             const el = e.target as HTMLElement
-            el.style.transitionDelay = (el.dataset.d || '0') + 'ms'
+            el.style.animationDelay = (el.dataset.d || '0') + 'ms'
             el.classList.add('in')
             io.unobserve(el)
           }
