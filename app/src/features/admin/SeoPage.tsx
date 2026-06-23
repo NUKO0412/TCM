@@ -3,12 +3,11 @@ import { useAuth } from '../auth'
 import { ROUTES } from '../../config/routes'
 import { useSeo } from './useSeo'
 
-// Onglet SEO en lecture seule : Théo (admin) voit la SEO reçue de Hubelly
-// (métas, mots-clés, OG, date) sans pouvoir la modifier. Le bloc « Intégration »
-// (URL du point de réception) n'est visible qu'au super-admin ; la clé reste
-// un secret serveur et n'est jamais affichée.
+// Onglet SEO en lecture seule : l'éditeur (admin ou super_admin, droits identiques)
+// voit la SEO reçue de Hubelly (métas, mots-clés, OG, date) ET le bloc Intégration
+// (point de réception). La clé API reste un secret serveur, jamais affichée ici.
 export function SeoPage() {
-  const { role, signOut } = useAuth()
+  const { signOut } = useAuth()
   const { row, loading, error } = useSeo('/')
   const seo = row?.data ?? null
   const received = Boolean(row)
@@ -70,21 +69,19 @@ export function SeoPage() {
             <SearchConsoleBlock data={seo?.searchConsole} />
           </div>
 
-          {role === 'super_admin' && (
-            <div style={{ ...card, padding: 16, marginTop: 20 }}>
-              <div style={label}>Intégration · super-admin</div>
-              <div style={{ marginTop: 12, display: 'grid', gap: 14 }}>
-                <FieldBlock label="Point de réception" value="https://www.tcmagencement.fr/api/seo-ingest" mono flat />
-                <FieldBlock label="Méthode" value="POST · en-tête Authorization: Bearer <clé>" mono flat />
-                <div>
-                  <div style={label}>Clé API</div>
-                  <div style={{ fontSize: 14, color: '#E5DCC9', marginTop: 4, lineHeight: 1.5 }}>
-                    Stockée comme secret Vercel <code style={code}>SEO_INGEST_KEY</code> — jamais affichée ici.
-                  </div>
+          <div style={{ ...card, padding: 16, marginTop: 20 }}>
+            <div style={label}>Intégration · SEO</div>
+            <div style={{ marginTop: 12, display: 'grid', gap: 14 }}>
+              <FieldBlock label="Point de réception" value="https://www.tcmagencement.fr/api/seo-ingest" mono flat />
+              <FieldBlock label="Méthode" value="POST · en-tête Authorization: Bearer <clé>" mono flat />
+              <div>
+                <div style={label}>Clé API</div>
+                <div style={{ fontSize: 14, color: '#E5DCC9', marginTop: 4, lineHeight: 1.5 }}>
+                  Stockée comme secret Vercel <code style={code}>SEO_INGEST_KEY</code> — jamais affichée ici.
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </>
       )}
     </main>

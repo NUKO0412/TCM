@@ -14,9 +14,10 @@ const ROUTE_FOR_LABEL: Record<string, string> = {
 const resolveHref = (l: { label: string; href: string }) =>
   l.href && l.href !== '#' ? l.href : (ROUTE_FOR_LABEL[l.label] ?? l.href)
 
-// Liens déjà couverts par la colonne dédiée « Informations légales » : on évite
-// le doublon dans les colonnes issues du contenu (ex. « Mentions légales »).
-const OWNED_BY_LEGAL_COL = new Set(['Mentions légales'])
+// Liens à ne pas afficher dans les colonnes issues du contenu :
+// - « Mentions légales » : déjà dans la colonne dédiée « Informations légales » (anti-doublon)
+// - « Espace administrateur » : zone réservée, aucune raison d'être exposée dans le footer public
+const HIDDEN_FOOTER_LINKS = new Set(['Mentions légales', 'Espace administrateur'])
 
 export function Footer() {
   const { header, footer } = useContent()
@@ -44,7 +45,7 @@ export function Footer() {
             return (
               <div className="foot-col" key={col.title}>
                 <h4>{col.title}</h4>
-                {col.links.filter((l) => !OWNED_BY_LEGAL_COL.has(l.label)).map((l) => {
+                {col.links.filter((l) => !HIDDEN_FOOTER_LINKS.has(l.label)).map((l) => {
                   const href = resolveHref(l)
                   return href.startsWith('/') ? (
                     <Link to={href} key={l.label}>
