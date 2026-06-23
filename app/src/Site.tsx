@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useScrolledHeader } from './hooks/useScrolledHeader'
 import { useReveal } from './hooks/useReveal'
+import { useHideHeaderOnInput } from './hooks/useHideHeaderOnInput'
 import { ContentProvider } from './features/content'
 import { AdminBar, EditModeProvider, useEditMode } from './features/edit'
 import { IconDefs } from './components/IconDefs'
@@ -33,6 +34,7 @@ function SiteInner() {
   const wasEditing = useRef(false)
   useScrolledHeader()
   useReveal()
+  useHideHeaderOnInput()
 
   // En édition : tout est visible (pas d'attente du scroll pour éditer).
   // En SORTANT de l'édition : on garde toutes les cartes visibles (les éléments
