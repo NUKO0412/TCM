@@ -18,7 +18,12 @@ export function ResetPasswordPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [recoveryState, setRecoveryState] = useState<'idle' | 'processing' | 'failed'>('idle')
+  // État initial calculé au rendu (les jetons sont dans l'URL dès l'arrivée) :
+  // évite de fixer 'processing' dans l'effet (cascade de rendus).
+  const [recoveryState, setRecoveryState] = useState<'idle' | 'processing' | 'failed'>(() => {
+    const p = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    return p.get('access_token') && p.get('refresh_token') ? 'processing' : 'idle'
+  })
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
@@ -28,7 +33,6 @@ export function ResetPasswordPage() {
     if (!accessToken || !refreshToken) return
 
     let cancelled = false
-    setRecoveryState('processing')
 
     supabase.auth
       .setSession({ access_token: accessToken, refresh_token: refreshToken })
