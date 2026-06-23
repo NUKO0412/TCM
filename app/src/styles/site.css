@@ -298,10 +298,8 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 }
 @media(max-width:1024px){
   .menu{gap:20px}
-  /* « Faire défiler » : sur tablette/mobile, on le recentre en bas (au lieu du bord
-     droit) pour qu'il ne morde plus sur le titre du héros. */
-  .scroll-cue{right:auto;left:50%;transform:translateX(-50%);bottom:16px;writing-mode:horizontal-tb;flex-direction:column;gap:8px}
-  .scroll-cue::after{width:1px;height:28px}
+  /* « Faire défiler » retiré sur tablette/mobile (inutile au doigt, se collait aux boutons). */
+  .scroll-cue{display:none}
   .split,.zone-grid,.contact-grid{grid-template-columns:1fr;gap:42px;padding:84px 0}
   .presta,.methode,.contact,.zone{padding:84px 0}
   .real{padding:20px 0 84px}
