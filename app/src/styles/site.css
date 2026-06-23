@@ -261,6 +261,19 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 .carousel-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:7px}
 .carousel-dots span{width:7px;height:7px;border-radius:50%;background:rgba(244,237,223,.5);cursor:pointer;transition:background .2s}
 .carousel-dots span.on{background:var(--oak-2)}
+/* Carrousel public Embla (lecture seule) : reproduit le cadre image plein écran
+   de la carte. N'affecte que la vue publique ; le mode édition est inchangé. */
+.embla-viewport{position:absolute;inset:0;overflow:hidden;touch-action:pan-y}
+.embla-container{display:flex;height:100%}
+.embla-slide{position:relative;flex:0 0 100%;min-width:0;height:100%;transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.embla-slide img{-webkit-user-drag:none;user-select:none}
+/* Appareils tactiles (mobile/tablette) : pas de flèches, le glissé suffit ; et pas
+   de zoom « collé » au survol (sur iOS le hover reste actif après un tap). Sur
+   ordinateur (hover disponible) les flèches restent au survol, inchangées. */
+@media (hover:none){
+  .carousel-arrow{display:none}
+  .shot:hover img{transform:none}
+}
 .carousel-edit{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:8;display:flex;align-items:center;gap:10px;background:rgba(12,10,7,.88);border:1px solid var(--line-d);border-radius:20px;padding:6px 12px}
 .carousel-edit button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--cream);background:transparent;border:none;cursor:pointer}
 .carousel-edit button:hover{color:var(--oak-2)}

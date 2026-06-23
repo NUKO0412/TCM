@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
 import { useContent, useStore, type StoreItem } from '../features/content'
 import { EditableImage, EditableList, EditableText, useEditMode } from '../features/edit'
 import { uploadImage } from '../lib/storage'
@@ -29,14 +30,120 @@ function readImages(data: Record<string, unknown>): Photo[] {
   return [{ src: '', alt: '' }]
 }
 
-// Carrousel d'une carte : jusqu'à 3 photos. Flèches au survol dès 2 photos.
-function Carousel({
-  item,
-  onView,
-}: {
+type CarouselProps = {
   item: StoreItem
   onView: (p: { images: Photo[]; index: number }) => void
-}) {
+}
+
+// Aiguillage : en lecture publique → carrousel Embla (glissé fluide, flèches +
+// points). En édition → mécanique d'administration inchangée (remplacement,
+// ajout/retrait jusqu'à 3 FIFO, taille de carte).
+function Carousel(props: CarouselProps) {
+  const { editing } = useEditMode()
+  return editing ? <EditCarousel {...props} /> : <PublicCarousel {...props} />
+}
+
+// Carrousel public (lecture seule) : piste Embla. Glissé fluide au doigt + flèches
+// + points + tap pour ouvrir le plein écran. Aucune édition ici ; le rendu reste
+// identique aux cartes existantes (mêmes classes, même CSS).
+function PublicCarousel({ item, onView }: CarouselProps) {
+  const photos = readImages(item.data)
+    .filter((p) => p.src)
+    .map((p) => ({ src: p.src, alt: altFor(item.data, p.alt ?? '') }))
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: photos.length > 1 })
+  const [sel, setSel] = useState(0)
+  const dragged = useRef(false)
+  const down = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    if (!emblaApi) return
+    const onSelect = () => setSel(emblaApi.selectedScrollSnap())
+    emblaApi.on('select', onSelect)
+    onSelect()
+    return () => {
+      emblaApi.off('select', onSelect)
+    }
+  }, [emblaApi])
+
+  if (!photos.length) return null
+  if (photos.length === 1) {
+    return (
+      <img
+        src={photos[0].src}
+        alt={photos[0].alt}
+        style={{ cursor: 'zoom-in' }}
+        onClick={() => onView({ images: photos, index: 0 })}
+        loading="lazy"
+      />
+    )
+  }
+
+  return (
+    <>
+      <div
+        className="embla-viewport"
+        ref={emblaRef}
+        onPointerDownCapture={(e) => {
+          down.current = { x: e.clientX, y: e.clientY }
+          dragged.current = false
+        }}
+        onPointerMoveCapture={(e) => {
+          const d = down.current
+          if (d && Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 8) dragged.current = true
+        }}
+      >
+        <div className="embla-container">
+          {photos.map((p, k) => (
+            <div className="embla-slide" key={k}>
+              <img
+                src={p.src}
+                alt={p.alt}
+                style={{ cursor: 'zoom-in' }}
+                onClick={() => {
+                  if (dragged.current) return
+                  onView({ images: photos, index: k })
+                }}
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <button
+        className="carousel-arrow prev"
+        aria-label="Précédent"
+        onClick={(e) => {
+          e.stopPropagation()
+          emblaApi?.scrollPrev()
+        }}
+      />
+      <button
+        className="carousel-arrow next"
+        aria-label="Suivant"
+        onClick={(e) => {
+          e.stopPropagation()
+          emblaApi?.scrollNext()
+        }}
+      />
+      <div className="carousel-dots">
+        {photos.map((_, k) => (
+          <span
+            key={k}
+            className={k === sel ? 'on' : ''}
+            onClick={(e) => {
+              e.stopPropagation()
+              emblaApi?.scrollTo(k)
+            }}
+          />
+        ))}
+      </div>
+    </>
+  )
+}
+
+// Carrousel en mode édition : INCHANGÉ. Une photo affichée à la fois, flèches au
+// survol dès 2 photos, remplacement, ajout/retrait, taille de carte.
+function EditCarousel({ item, onView }: CarouselProps) {
   const { editing } = useEditMode()
   const { updateItem } = useStore()
   const images = readImages(item.data)
@@ -154,9 +261,15 @@ function Carousel({
 // Glissement tactile (swipe) pour changer de photo sur mobile : on réutilise les
 // flèches existantes de la carte. Un vrai glissement annule l'ouverture de l'aperçu.
 function SwipeShot({ className, children }: { className: string; children: ReactNode }) {
+  const { editing } = useEditMode()
   const ref = useRef<HTMLDivElement>(null)
   const start = useRef<{ x: number; y: number } | null>(null)
   const swiped = useRef(false)
+
+  // En lecture publique, Embla gère lui-même le glissé : aucune couche tactile ici
+  // (sinon double navigation). Le mode édition garde la mécanique d'origine.
+  if (!editing) return <div className={className}>{children}</div>
+
   return (
     <div
       ref={ref}
