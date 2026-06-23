@@ -279,20 +279,6 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 .carousel-edit button:hover{color:var(--oak-2)}
 .carousel-count{font-family:var(--mono);font-size:11px;color:var(--muted)}
 
-/* aperçu d'une photo (clic sur une réalisation) : image entière, à sa taille */
-.lightbox{position:fixed;inset:0;z-index:200;background:rgba(8,7,5,.55);display:grid;place-items:center;padding:24px;cursor:zoom-out;animation:lb-in .15s ease}
-.lightbox-img{width:auto;height:auto;max-width:86vw;max-height:84vh;border-radius:6px;box-shadow:0 24px 70px -22px rgba(0,0,0,.7);cursor:auto}
-.lightbox-arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:201;width:48px;height:48px;display:grid;place-items:center;border:none;border-radius:50%;background:rgba(12,10,7,.6);color:var(--cream);cursor:pointer;opacity:.9;transition:opacity .2s,background .2s}
-.lightbox-arrow:hover{opacity:1;background:rgba(12,10,7,.85)}
-.lightbox-arrow::before{content:"";display:block;width:11px;height:11px;border-top:2px solid currentColor;border-right:2px solid currentColor}
-.lightbox-arrow.prev{left:20px}
-.lightbox-arrow.prev::before{transform:translateX(3px) rotate(-135deg)}
-.lightbox-arrow.next{right:20px}
-.lightbox-arrow.next::before{transform:translateX(-3px) rotate(45deg)}
-.lightbox-dots{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:201;display:flex;gap:8px}
-.lightbox-dots span{width:8px;height:8px;border-radius:50%;background:rgba(244,237,223,.5);cursor:pointer;transition:background .2s}
-.lightbox-dots span.on{background:var(--oak-2)}
-@keyframes lb-in{from{opacity:0}to{opacity:1}}
 .edit-grip{position:absolute;top:6px;left:6px;z-index:6;width:24px;height:24px;display:grid;place-items:center;cursor:grab;font-size:14px;color:var(--ink);background:var(--oak-2);border-radius:6px;opacity:.9;user-select:none}
 .edit-remove{position:absolute;top:6px;right:6px;z-index:6;width:24px;height:24px;display:grid;place-items:center;cursor:pointer;font-size:18px;line-height:1;color:#fff;background:#a23b2c;border:none;border-radius:6px;opacity:.9}
 .edit-remove:hover{opacity:1}
