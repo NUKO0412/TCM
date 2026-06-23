@@ -176,7 +176,7 @@ export function Contact() {
             <button className="btn btn-primary" type="submit" disabled={status === 'sending' || status === 'sent'}>
               {status === 'sending' ? 'Envoi…' : status === 'sent' ? 'Demande envoyée' : submitLabel}{' '}
               <span className="ic">
-                <Icon name="i-send" className="" />
+                <Icon name="i-send" />
               </span>
             </button>
             {status === 'error' && (

@@ -37,7 +37,7 @@ export function Hero() {
               <a key={c.label} className="btn btn-primary" href={c.href}>
                 {c.label}{' '}
                 <span className="ic">
-                  <Icon name="i-arrow" className="" />
+                  <Icon name="i-arrow" />
                 </span>
               </a>
             ) : (
