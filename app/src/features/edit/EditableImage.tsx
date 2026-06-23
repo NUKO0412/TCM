@@ -45,7 +45,7 @@ export function EditableImage({
       onReplace(await uploadImage(files[0]))
     } catch (e) {
       console.error('upload image', e)
-      alert("Échec de l'upload de l'image.")
+      alert("Échec de l'upload de l'image : " + (e instanceof Error ? e.message : String(e)))
     } finally {
       setBusy(false)
     }

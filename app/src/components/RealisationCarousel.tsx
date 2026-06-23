@@ -174,7 +174,7 @@ function EditCarousel({ item, onView }: CarouselProps) {
       setIdx(next.length - 1)
     } catch (e) {
       console.error('upload', e)
-      alert("Échec de l'upload d'une photo.")
+      alert("Échec de l'upload d'une photo : " + (e instanceof Error ? e.message : String(e)))
     } finally {
       setBusy(false)
     }
