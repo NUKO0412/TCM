@@ -36,23 +36,30 @@ export function Footer() {
               <EditableText sectionKey="footer" path="brandDesc" value={footer.brandDesc} multiline />
             </p>
           </div>
-          {footer.columns.map((col) => (
-            <div className="foot-col" key={col.title}>
-              <h4>{col.title}</h4>
-              {col.links.filter((l) => !OWNED_BY_LEGAL_COL.has(l.label)).map((l) => {
-                const href = resolveHref(l)
-                return href.startsWith('/') ? (
-                  <Link to={href} key={l.label}>
-                    {l.label}
-                  </Link>
-                ) : (
-                  <a href={href} key={l.label}>
-                    {l.label}
-                  </a>
-                )
-              })}
-            </div>
-          ))}
+          {footer.columns.map((col) => {
+            // Colonne de navigation = celle avec de vraies ancres de page (#presta…),
+            // pas le simple placeholder « # » de la colonne Accès. On y ajoute « FAQ ».
+            const isNav = col.links.some((l) => l.href.length > 1 && l.href.startsWith('#'))
+            const hasFaq = col.links.some((l) => l.label.toUpperCase() === 'FAQ')
+            return (
+              <div className="foot-col" key={col.title}>
+                <h4>{col.title}</h4>
+                {col.links.filter((l) => !OWNED_BY_LEGAL_COL.has(l.label)).map((l) => {
+                  const href = resolveHref(l)
+                  return href.startsWith('/') ? (
+                    <Link to={href} key={l.label}>
+                      {l.label}
+                    </Link>
+                  ) : (
+                    <a href={href} key={l.label}>
+                      {l.label}
+                    </a>
+                  )
+                })}
+                {isNav && !hasFaq && <a href="#faq">FAQ</a>}
+              </div>
+            )
+          })}
           <div className="foot-col">
             <h4>Informations légales</h4>
             <Link to={ROUTES.legal}>Mentions légales</Link>

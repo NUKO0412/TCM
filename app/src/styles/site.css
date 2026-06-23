@@ -87,7 +87,7 @@ header.scrolled{background:rgba(16,14,11,.96);border-bottom:1px solid var(--line
 .hero-inner{position:relative;z-index:3;padding:0 0 86px}
 .hero h1{font-size:clamp(42px,7vw,92px);max-width:14ch;margin:22px 0 0}
 .hero h1 i{font-style:italic;color:var(--oak-2)}
-.hero .eyebrow{color:var(--oak-2);background:rgba(12,10,7,.74);padding:9px 16px;border-radius:30px;border:1px solid rgba(217,172,99,.22)}
+.hero .eyebrow{color:var(--oak-2);background:rgba(12,10,7,.74);padding:9px 16px;border-radius:30px;border:1px solid rgba(217,172,99,.22);justify-content:center;text-align:center}
 .hero .eyebrow::before{display:none}
 .hero h1,.hero p.sub,.hero .eyebrow{text-shadow:0 2px 28px rgba(0,0,0,.62),0 1px 3px rgba(0,0,0,.5)}
 .hero p.sub{font-size:clamp(16px,1.6vw,20px);color:#E5DCC9;max-width:54ch;margin:26px 0 0;line-height:1.55}
