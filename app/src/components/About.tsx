@@ -30,6 +30,7 @@ export function About() {
           src={figure.img.src}
           alt={figure.img.alt}
           onReplace={(url) => void updateSection('about', 'figure.img.src', url)}
+          loading="lazy"
         />
         <span className="tick">
           <EditableText sectionKey="about" path="figure.tick" value={figure.tick} />

@@ -265,7 +265,7 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stro
    de la carte. N'affecte que la vue publique ; le mode édition est inchangé. */
 .embla-viewport{position:absolute;inset:0;overflow:hidden;touch-action:pan-y}
 .embla-container{display:flex;height:100%}
-.embla-slide{position:relative;flex:0 0 100%;min-width:0;height:100%}
+.embla-slide{position:relative;flex:0 0 100%;min-width:0;height:100%;transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .embla-slide img{-webkit-user-drag:none;user-select:none}
 /* Appareils tactiles (mobile/tablette) : pas de flèches, le glissé suffit ; et pas
    de zoom « collé » au survol (sur iOS le hover reste actif après un tap). Sur

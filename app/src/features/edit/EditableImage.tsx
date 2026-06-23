@@ -13,10 +13,21 @@ type Props = {
   // Si fourni : la sélection/le glisser accepte PLUSIEURS fichiers, gérés par
   // l'appelant (ex. carrousel : ajoute jusqu'à 3 photos d'un coup).
   onFiles?: (files: FileList) => void
+  // Perf : 'lazy' pour les images sous la ligne de flottaison (pas le hero).
+  loading?: 'lazy' | 'eager'
 }
 
 // En lecture : <img> identique. En édition : overlay glisser-déposer / clic.
-export function EditableImage({ src, alt, className, style, onReplace, onView, onFiles }: Props) {
+export function EditableImage({
+  src,
+  alt,
+  className,
+  style,
+  onReplace,
+  onView,
+  onFiles,
+  loading,
+}: Props) {
   const { editing } = useEditMode()
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -48,6 +59,7 @@ export function EditableImage({ src, alt, className, style, onReplace, onView, o
         className={className}
         style={onView ? { ...style, cursor: 'zoom-in' } : style}
         onClick={onView}
+        loading={loading}
       />
     )
   }

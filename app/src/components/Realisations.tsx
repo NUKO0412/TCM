@@ -73,6 +73,7 @@ function PublicCarousel({ item, onView }: CarouselProps) {
         alt={photos[0].alt}
         style={{ cursor: 'zoom-in' }}
         onClick={() => onView({ images: photos, index: 0 })}
+        loading="lazy"
       />
     )
   }
@@ -102,6 +103,7 @@ function PublicCarousel({ item, onView }: CarouselProps) {
                   if (dragged.current) return
                   onView({ images: photos, index: k })
                 }}
+                loading="lazy"
               />
             </div>
           ))}
