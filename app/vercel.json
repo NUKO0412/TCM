@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/reinitialisation", "destination": "/reinitialisation.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

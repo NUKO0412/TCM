@@ -13,3 +13,6 @@ supabase/.db-password
 
 # Dossier de travail des photos (téléchargées, choisies à la main) — pas dans git
 Photo Instagram Théo/
+
+# Captures d'écran locales — pas dans git
+captures/

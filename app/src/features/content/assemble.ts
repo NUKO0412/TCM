@@ -4,6 +4,7 @@ import type {
   PrestaCard,
   Step,
   Shot,
+  FaqItem,
 } from '../../data/types'
 import type { SectionRow, ItemRow } from './rows'
 
@@ -29,6 +30,10 @@ export function assemble(sectionRows: SectionRow[], itemRows: ItemRow[]): SiteCo
   const zoneMeta = section<Omit<SiteContent['zone'], 'villes'>>('zone')
   const contactMeta = section<Omit<SiteContent['contact'], 'projectTypes'>>('contact')
 
+  // FAQ tolérante : la section peut être absente (base pas encore alimentée).
+  const faqMeta = sections.get('faq') as { eyebrow: string; heading: string } | undefined
+  const faq = faqMeta ? { ...faqMeta, items: items('faq') as FaqItem[] } : undefined
+
   return {
     header: section('header'),
     hero: section('hero'),
@@ -51,6 +56,7 @@ export function assemble(sectionRows: SectionRow[], itemRows: ItemRow[]): SiteCo
       ...zoneMeta,
       villes: (items('villes') as { name: string }[]).map((v) => v.name),
     },
+    ...(faq ? { faq } : {}),
     contact: {
       ...contactMeta,
       projectTypes: (items('project_types') as { value: string }[]).map((p) => p.value),

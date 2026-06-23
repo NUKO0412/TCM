@@ -125,6 +125,17 @@ export interface Footer {
   bottom: { left: string; right: string }
 }
 
+export interface FaqItem {
+  q: string
+  a: string
+}
+
+export interface Faq {
+  eyebrow: string
+  heading: string
+  items: FaqItem[]
+}
+
 export interface SiteContent {
   header: Header
   hero: Hero
@@ -134,6 +145,8 @@ export interface SiteContent {
   methode: Methode
   realisations: Realisations
   zone: Zone
+  // FAQ optionnelle : absente tant que la base n'a pas la section "faq".
+  faq?: Faq
   contact: Contact
   footer: Footer
 }

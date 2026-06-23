@@ -4,6 +4,18 @@ import { Icon } from './IconDefs'
 
 const s = (v: unknown) => (typeof v === 'string' ? v : '')
 
+// Ancre interne (invisible) dérivée du titre de la prestation : rend chaque carte
+// adressable via /#parquet-flottant-et-massif et tient le maillage interne. Pur
+// attribut côté code, le texte de la carte reste entièrement administrable.
+const slug = (v: string) =>
+  v
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/&/g, ' et ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
 export function Prestations() {
   const { eyebrow, heading, lead, cta } = useContent().prestations
   return (
@@ -25,7 +37,7 @@ export function Prestations() {
             newItem={() => ({ num: '00', icon: 'i-plank', title: 'Nouvelle prestation', text: 'Description.' })}
           >
             {(item) => (
-              <div className="card reveal">
+              <div className="card reveal" id={slug(s(item.data.title)) || undefined}>
                 <span className="num">{s(item.data.num)}</span>
                 <div className="ic">
                   <Icon name={s(item.data.icon) || 'i-plank'} />

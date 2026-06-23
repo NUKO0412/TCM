@@ -1,5 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["middleware.ts", "api/**/*.ts", "scripts/*.ts"],
+  "entry": ["api/**/*.ts", "scripts/*.ts"],
   "ignoreExportsUsedInFile": true
 }

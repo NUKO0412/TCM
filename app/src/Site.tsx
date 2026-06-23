@@ -12,6 +12,7 @@ import { Prestations } from './components/Prestations'
 import { Methode } from './components/Methode'
 import { Realisations } from './components/Realisations'
 import { Zone } from './components/Zone'
+import { Faq } from './components/Faq'
 import { Contact } from './components/Contact'
 import { Footer } from './components/Footer'
 
@@ -59,6 +60,7 @@ function SiteInner() {
       <Methode />
       <Realisations />
       <Zone />
+      <Faq />
       <Contact />
       <Footer />
       <IconDefs />

@@ -111,6 +111,29 @@ export const content: SiteContent = {
     villes: ['Lorient', 'Lanester', 'Hennebont', 'Ploemeur', 'Guidel', 'Vannes', 'Morbihan', 'Finistère'],
   },
 
+  faq: {
+    eyebrow: 'Questions fréquentes',
+    heading: 'Vos questions, nos réponses.',
+    items: [
+      {
+        q: 'Intervenez-vous à Vannes et dans le Finistère ?',
+        a: "L'activité est centrée sur Lorient et le Morbihan. Selon le projet, TCM Agencement se déplace jusqu'à Vannes et dans le Finistère.",
+      },
+      {
+        q: "Posez-vous une cuisine que j'ai achetée ailleurs ?",
+        a: 'Oui. TCM Agencement peut poser et ajuster une cuisine fournie par le client, y compris la découpe et la pose des plans de travail et les finitions.',
+      },
+      {
+        q: 'Travaillez-vous pour les professionnels ?',
+        a: 'Oui, pour les particuliers comme pour les professionnels : agencement intérieur, mobilier sur mesure et aménagements bois.',
+      },
+      {
+        q: 'Comment se passe une demande de devis ?',
+        a: 'Décrivez votre projet via le formulaire de contact. TCM Agencement vous rappelle pour organiser une visite et un relevé, puis remet un devis clair.',
+      },
+    ],
+  },
+
   contact: {
     eyebrow: 'Contact',
     heading: 'Parlons de votre projet.',

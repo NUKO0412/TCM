@@ -24,6 +24,8 @@ const anon = process.env.VITE_SUPABASE_ANON_KEY
 
 const MARK_START = '<!-- seo:start -->'
 const MARK_END = '<!-- seo:end -->'
+const FAQ_START = '<!-- faq:start -->'
+const FAQ_END = '<!-- faq:end -->'
 
 async function fetchSeo(): Promise<SeoData | null> {
   if (!url || !anon) return null
@@ -39,19 +41,54 @@ async function fetchSeo(): Promise<SeoData | null> {
   }
 }
 
+// FAQ réellement publiée (collection content_items "faq") : schema FAQPage qui
+// correspond EXACTEMENT aux questions affichées. Invisible, n'altère pas la page.
+async function fetchFaq(): Promise<{ q: string; a: string }[]> {
+  if (!url || !anon) return []
+  try {
+    const res = await fetch(`${url}/rest/v1/content_items?collection=eq.faq&select=data,ord&order=ord`, {
+      headers: { apikey: anon, authorization: `Bearer ${anon}` },
+    })
+    if (!res.ok) return []
+    const rows = (await res.json()) as { data: { q?: string; a?: string } }[]
+    return rows.map((r) => ({ q: r.data?.q ?? '', a: r.data?.a ?? '' })).filter((x) => x.q && x.a)
+  } catch {
+    return []
+  }
+}
+
+function buildFaqJsonLd(faq: { q: string; a: string }[]): string {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+  return `<script type="application/ld+json">${JSON.stringify(data)}</script>`
+}
+
 async function main() {
-  const seo = await fetchSeo()
+  const [seo, faq] = await Promise.all([fetchSeo(), fetchFaq()])
   const { title, tags } = buildHead(seo)
   const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;')
 
   const indexPath = resolve(here, '../dist/index.html')
   let html = readFileSync(indexPath, 'utf8')
   html = html.replace(new RegExp(`${MARK_START}[\\s\\S]*?${MARK_END}\\s*`), '') // idempotence
+  html = html.replace(new RegExp(`${FAQ_START}[\\s\\S]*?${FAQ_END}\\s*`), '') // idempotence
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${safeTitle}</title>`)
   html = html.replace('</head>', `  ${MARK_START}\n    ${tags}\n    ${MARK_END}\n  </head>`)
+  if (faq.length) {
+    html = html.replace('</head>', `  ${FAQ_START}\n    ${buildFaqJsonLd(faq)}\n    ${FAQ_END}\n  </head>`)
+  }
   writeFileSync(indexPath, html)
 
-  console.log(`✓ SEO injectée dans dist/index.html ${seo ? '(données seo)' : '(repli, table vide)'}`)
+  console.log(
+    `✓ SEO injectée dans dist/index.html ${seo ? '(données seo)' : '(repli, table vide)'} · FAQ ${faq.length} Q`,
+  )
 }
 
 main().catch((e) => {
