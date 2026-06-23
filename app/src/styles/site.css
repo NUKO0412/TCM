@@ -31,7 +31,11 @@ header.scrolled{background:rgba(16,14,11,.96);border-bottom:1px solid var(--line
    champ que le navigateur remonte en haut au focus. Revient à la fin de la saisie.
    Sur ordinateur (hover) : jamais déclenché. */
 @media (max-width:820px){
-  html.is-typing header{transform:translateY(-100%);pointer-events:none}
+  html.is-typing{scroll-padding-top:0}
+  html.is-typing header{transform:translateY(-100%);pointer-events:none;transition:none}
+  html.is-typing .field input,
+  html.is-typing .field select,
+  html.is-typing .field textarea{scroll-margin-top:0}
 }
 .nav{display:flex;align-items:center;justify-content:space-between;height:78px}
 .brand{display:flex;align-items:center;gap:13px}
