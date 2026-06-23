@@ -29,24 +29,27 @@ export function Header() {
               {l.label}
             </a>
           ))}
+        </nav>
+        {/* Zone d'authentification à largeur réservée : le bouton et le libellé de
+            rôle gardent une position fixe, connecté ou non, donc les liens (centrés)
+            ne bougent plus entre les deux états. */}
+        <div className="nav-auth">
           {session ? (
-            <>
-              <button
-                type="button"
-                className="btn-login"
-                onClick={() => void signOut()}
-                style={{ background: 'transparent', color: 'var(--cream)', cursor: 'pointer' }}
-              >
-                <Icon name="i-lock" style={{ width: 15, height: 15 }} /> Déconnexion
-              </button>
-              {role && <span className="role-tag">{roleLabel(role)}</span>}
-            </>
+            <button
+              type="button"
+              className="btn-login"
+              onClick={() => void signOut()}
+              style={{ background: 'transparent', color: 'var(--cream)', cursor: 'pointer' }}
+            >
+              <Icon name="i-lock" style={{ width: 15, height: 15 }} /> Déconnexion
+            </button>
           ) : (
             <Link className="btn-login" to={ROUTES.login}>
               <Icon name="i-lock" style={{ width: 15, height: 15 }} /> {loginLabel}
             </Link>
           )}
-        </nav>
+          <span className="role-tag">{session && role ? roleLabel(role) : ''}</span>
+        </div>
         <button
           type="button"
           className="burger"
