@@ -26,6 +26,9 @@ export async function openGallery(photos: Photo[], index: number) {
         }),
     ),
   )
+  // loop laissé au comportement par défaut de PhotoSwipe : il boucle à partir de 3
+  // photos et NE boucle pas à 2 (forcer le bouclage à 2 affiche des slides vides,
+  // la librairie n'ayant que 3 emplacements). À 2 photos on revient en arrière.
   const pswp = new PhotoSwipe({ dataSource, index, bgOpacity: 0.92 })
   pswp.init()
 }
