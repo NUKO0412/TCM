@@ -3,7 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { useContent, useStore, type StoreItem } from '../features/content'
 import { EditableImage, EditableList, EditableText, useEditMode } from '../features/edit'
 import { uploadImage } from '../lib/storage'
-import { Lightbox } from './Lightbox'
+import { openGallery } from './gallery'
 import { Icon } from './IconDefs'
 
 const s = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -310,14 +310,13 @@ function SwipeShot({ className, children }: { className: string; children: React
 
 export function Realisations() {
   const { eyebrow, heading, cta } = useContent().realisations
-  const [preview, setPreview] = useState<{ images: Photo[]; index: number } | null>(null)
 
   // Touches ←/→ : naviguent le carrousel de la carte SURVOLÉE (public + édition),
-  // en réutilisant ses flèches. L'aperçu plein écran gère déjà son propre clavier.
+  // en réutilisant ses flèches. Le plein écran (PhotoSwipe) gère son propre clavier.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
-      if (document.querySelector('.lightbox')) return
+      if (document.querySelector('.pswp')) return
       // Pendant la saisie d'un texte, ←/→ servent à se déplacer dans le texte.
       const ae = document.activeElement as HTMLElement | null
       if (ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return
@@ -357,7 +356,7 @@ export function Realisations() {
         >
           {(item) => (
             <SwipeShot className={`shot ${s(item.data.span) || 's-b'} reveal`}>
-              <Carousel item={item} onView={setPreview} />
+              <Carousel item={item} onView={(p) => void openGallery(p.images, p.index)} />
               <div className="cap">
                 <span>
                   <EditableText itemId={item.id} field="category" value={s(item.data.category)} />
@@ -370,9 +369,6 @@ export function Realisations() {
           )}
         </EditableList>
       </div>
-      {preview && (
-        <Lightbox images={preview.images} index={preview.index} onClose={() => setPreview(null)} />
-      )}
     </section>
   )
 }
