@@ -1,6 +1,3 @@
-import PhotoSwipe from 'photoswipe'
-import 'photoswipe/style.css'
-
 type Photo = { src: string; alt: string }
 
 // Ouvre une galerie plein écran PhotoSwipe : zoom au pincement, glissé entre les
@@ -8,6 +5,13 @@ type Photo = { src: string; alt: string }
 // des dimensions de chaque image : on les lit en préchargeant (max 3 par carte).
 export async function openGallery(photos: Photo[], index: number) {
   if (!photos.length) return
+  // Import dynamique : PhotoSwipe (et son CSS) ne sont chargés qu'à la première
+  // ouverture du plein écran. Évite de tirer la librairie dans le graphe de
+  // pré-rendu serveur et dans le chunk initial — aucun impact visuel.
+  const [{ default: PhotoSwipe }] = await Promise.all([
+    import('photoswipe'),
+    import('photoswipe/style.css'),
+  ])
   const dataSource = await Promise.all(
     photos.map(
       (p) =>

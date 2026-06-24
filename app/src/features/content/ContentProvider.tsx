@@ -30,15 +30,23 @@ function setPath(target: unknown, path: string, value: unknown): unknown {
 const now = () => new Date().toISOString()
 
 export function ContentProvider({ children }: { children: ReactNode }) {
-  const [sections, setSections] = useState<SectionRow[]>([])
-  const [items, setItems] = useState<ItemRow[]>([])
-  const [ready, setReady] = useState(false)
+  // Photo des données figée au build (index.html) : permet d'afficher le contenu
+  // dès le premier rendu, identique au HTML pré-rendu (hydratation sans flash).
+  // Absente en dev ou si le pré-rendu a échoué → comportement d'origine (vide
+  // jusqu'au fetch Supabase ci-dessous).
+  const snapshot = globalThis.__TCM_CONTENT__
+  const initialSections = (snapshot?.sections as SectionRow[] | undefined) ?? []
+  const initialItems = (snapshot?.items as ItemRow[] | undefined) ?? []
+
+  const [sections, setSections] = useState<SectionRow[]>(initialSections)
+  const [items, setItems] = useState<ItemRow[]>(initialItems)
+  const [ready, setReady] = useState(Boolean(snapshot))
   const [error, setError] = useState<string | null>(null)
 
   // Sources de vérité synchrones : la donnée à écrire est TOUJOURS lue ici,
   // jamais via l'effet de bord d'un setState (qui n'est pas garanti synchrone).
-  const sectionsRef = useRef<SectionRow[]>([])
-  const itemsRef = useRef<ItemRow[]>([])
+  const sectionsRef = useRef<SectionRow[]>(initialSections)
+  const itemsRef = useRef<ItemRow[]>(initialItems)
   const commitSections = useCallback((next: SectionRow[]) => {
     sectionsRef.current = next
     setSections(next)
