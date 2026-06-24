@@ -4,7 +4,7 @@
       .wm{font-family:'Fraunces',Georgia,serif;font-weight:600}
       .mo{font-family:'Space Mono','Courier New',monospace}</style>
   </defs>
-  <rect x="0" y="0" width="120" height="120" rx="24" fill="#16140F"/>
+  <circle cx="60" cy="60" r="60" fill="#16140F"/>
   <circle cx="60" cy="60" r="50" fill="none" stroke="#c2904b" stroke-width="2"/>
   <circle cx="60" cy="60" r="44" fill="none" stroke="#c2904b" stroke-width="1" opacity="0.55"/>
   <text x="60" y="65" text-anchor="middle" class="wm" font-size="27" fill="#f4eddf">TCM</text>
