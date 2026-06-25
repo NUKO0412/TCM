@@ -6,7 +6,7 @@ describe('buildHead (SEO injectée pour les robots)', () => {
     const { title, tags } = buildHead(null)
     expect(title).toMatch(/TCM Agencement/)
     expect(tags).toContain('<meta name="description"')
-    expect(tags).not.toContain('<meta property="og:image"')
+    expect(tags).toContain('<meta property="og:image" content="https://www.tcmagencement.fr/og.png"')
     expect(tags).toContain('application/ld+json')
   })
 

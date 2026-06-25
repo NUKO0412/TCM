@@ -11,6 +11,7 @@ const email = content.contact.info.find((i) => i.icon === 'i-mail')?.text ?? 'th
 
 const TITLE_FALLBACK = 'TCM Agencement'
 const DESCRIPTION_FALLBACK = 'Menuiserie et agencement sur mesure à Lorient et dans le Morbihan.'
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`
 
 export const business = {
   name: content.header.brand.name,
@@ -77,25 +78,26 @@ export function buildHead(seo: SeoData | null): { title: string; tags: string } 
   const title = seo?.title ?? TITLE_FALLBACK
   const description = seo?.description ?? DESCRIPTION_FALLBACK
   const jsonLd = seo?.structuredData ?? buildJsonLd()
+  // Repli OG : même si Hubelly n'envoie pas d'OG (ou pas d'image), le site sert
+  // toujours une carte de partage complète, avec l'image livrée en dur (og.png).
+  const ogTitle = seo?.og?.title ?? title
+  const ogDescription = seo?.og?.description ?? description
+  const ogImage = seo?.og?.image ?? DEFAULT_OG_IMAGE
   const tags = [
     `<meta name="description" content="${esc(description)}" />`,
     `<link rel="canonical" href="${business.url}/" />`,
     ...(seo?.keywords?.length ? [`<meta name="keywords" content="${esc(seo.keywords.join(', '))}" />`] : []),
-    ...(seo?.og
-      ? [
-          `<meta property="og:type" content="website" />`,
-          `<meta property="og:site_name" content="${esc(business.name)}" />`,
-          `<meta property="og:locale" content="fr_FR" />`,
-          `<meta property="og:url" content="${business.url}/" />`,
-          `<meta property="og:title" content="${esc(seo.og.title ?? title)}" />`,
-          `<meta property="og:description" content="${esc(seo.og.description ?? description)}" />`,
-          ...(seo.og.image ? [`<meta property="og:image" content="${esc(seo.og.image)}" />`] : []),
-          `<meta name="twitter:card" content="summary_large_image" />`,
-          `<meta name="twitter:title" content="${esc(seo.og.title ?? title)}" />`,
-          `<meta name="twitter:description" content="${esc(seo.og.description ?? description)}" />`,
-          ...(seo.og.image ? [`<meta name="twitter:image" content="${esc(seo.og.image)}" />`] : []),
-        ]
-      : []),
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:site_name" content="${esc(business.name)}" />`,
+    `<meta property="og:locale" content="fr_FR" />`,
+    `<meta property="og:url" content="${business.url}/" />`,
+    `<meta property="og:title" content="${esc(ogTitle)}" />`,
+    `<meta property="og:description" content="${esc(ogDescription)}" />`,
+    `<meta property="og:image" content="${esc(ogImage)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${esc(ogTitle)}" />`,
+    `<meta name="twitter:description" content="${esc(ogDescription)}" />`,
+    `<meta name="twitter:image" content="${esc(ogImage)}" />`,
     `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
   ].join('\n    ')
   return { title, tags }
