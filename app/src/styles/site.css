@@ -239,6 +239,18 @@ footer{background:#100E0A;border-top:1px solid var(--line-d);padding:64px 0 34px
 .legal-doc li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--oak)}
 .legal-doc a{color:var(--oak-2);text-decoration:underline;text-underline-offset:2px}
 
+/* En-tête de la page légale : adaptatif sur mobile. En desktop, nom + bouton
+   « Retour au site » tiennent sur une ligne ; sur petit écran on réduit le logo
+   et le nom, on masque le sous-titre et on garde le bouton sur une ligne, pour
+   que rien ne déborde. Scopé à .legal-top : n'affecte ni le header ni le footer. */
+@media(max-width:600px){
+  .legal-top-inner{height:auto;min-height:58px;padding:10px 0;gap:12px}
+  .legal-top .brand b{font-size:15px}
+  .legal-top .brand span{display:none}
+  .legal-top .mono-mark,.legal-top .mono-mark svg{width:38px;height:38px}
+  .legal-back{font-size:11px;padding:8px 12px;white-space:nowrap;flex:0 0 auto}
+}
+
 /* svg icon sizing */
 svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .card svg.i{width:24px;height:24px}
