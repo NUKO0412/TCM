@@ -86,5 +86,18 @@ export default async function handler(request: Request): Promise<Response> {
     return reply(502, { error: 'store_failed', status: upsert.status, detail: detail.slice(0, 300) })
   }
 
+  // Rebuild auto : après un envoi SEO réussi, on déclenche un redéploiement Vercel
+  // pour que la page d'accueil pré-rendue reflète les nouvelles métas / le H1.
+  // Optionnel et non bloquant : si SEO_REBUILD_HOOK n'est pas configuré ou échoue,
+  // la SEO reste enregistrée et l'envoi répond quand même 200.
+  const rebuildHook = process.env.SEO_REBUILD_HOOK
+  if (rebuildHook) {
+    try {
+      await fetch(rebuildHook, { method: 'POST' })
+    } catch {
+      /* échec silencieux : la SEO est déjà enregistrée en base */
+    }
+  }
+
   return reply(200, { ok: true, page: body.page })
 }
