@@ -48,6 +48,22 @@ async function fetchSnapshot(): Promise<Snapshot | null> {
   return { sections, items }
 }
 
+// Le champ h1 (SEO) injecté par Hubelly, lu dans la table seo (page "/").
+async function fetchSeoH1(): Promise<string | undefined> {
+  if (!url || !anon) return undefined
+  try {
+    const res = await fetch(`${url}/rest/v1/seo?page=eq.${encodeURIComponent('/')}&select=data&limit=1`, {
+      headers: { apikey: anon, authorization: `Bearer ${anon}` },
+    })
+    if (!res.ok) return undefined
+    const rows = (await res.json()) as { data?: { h1?: string } }[]
+    const h1 = rows[0]?.data?.h1
+    return typeof h1 === 'string' && h1.trim() ? h1 : undefined
+  } catch {
+    return undefined
+  }
+}
+
 // Échappe le JSON pour l'inclure sans danger dans un <script> (coupe </script>).
 function safeJson(value: unknown): string {
   return JSON.stringify(value).replace(/</g, '\\u003c')
@@ -62,6 +78,12 @@ async function main() {
 
   // ContentProvider lit cette photo au rendu (serveur et client).
   globalThis.__TCM_CONTENT__ = snapshot
+
+  // Le H1 est du SEO (Hubelly) : on le pose en global pour que le rendu serveur
+  // (puis client) affiche le H1 envoyé par Hubelly. Repli : Hero retombe sur
+  // l'étiquette éditable si absent.
+  const seoH1 = await fetchSeoH1()
+  globalThis.__TCM_SEO__ = seoH1 ? { h1: seoH1 } : undefined
 
   const { render } = (await import(
     pathToFileURL(resolve(here, '../dist-ssr/entry-server.js')).href
@@ -84,6 +106,13 @@ async function main() {
   //    client, pour qu'il soit identique au HTML pré-rendu (hydratation propre).
   const seed = `<script>window.__TCM_CONTENT__=${safeJson(snapshot)}</script>`
   html = html.replace('</head>', `  ${seed}\n  </head>`)
+
+  // 3) embarque le H1 SEO (Hubelly) pour que le H1 côté client corresponde au
+  //    H1 pré-rendu (hydratation propre). Absent → Hero garde le repli.
+  if (seoH1) {
+    const seoSeed = `<script>window.__TCM_SEO__=${safeJson({ h1: seoH1 })}</script>`
+    html = html.replace('</head>', `  ${seoSeed}\n  </head>`)
+  }
 
   writeFileSync(indexPath, html)
   console.log(

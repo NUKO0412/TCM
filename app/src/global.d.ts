@@ -6,11 +6,19 @@ interface TcmContentSnapshot {
   items: { id: string; collection: string; ord: number; data: Record<string, unknown> }[]
 }
 
+// SEO injecté par Hubelly, figé au build et embarqué dans la page : pilote le H1
+// rendu (le H1 est du SEO, géré par Hubelly, pas par l'admin du site).
+interface TcmSeoSnapshot {
+  h1?: string
+}
+
 declare global {
   interface Window {
     __TCM_CONTENT__?: TcmContentSnapshot
+    __TCM_SEO__?: TcmSeoSnapshot
   }
   var __TCM_CONTENT__: TcmContentSnapshot | undefined
+  var __TCM_SEO__: TcmSeoSnapshot | undefined
 }
 
 export {}
