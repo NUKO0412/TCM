@@ -63,7 +63,25 @@ export default async function handler(request: Request): Promise<Response> {
   const serviceKey = process.env.SUPABASE_SERVICE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!supabaseUrl || !serviceKey) return reply(500, { error: 'server_misconfigured' })
 
-  const data: Record<string, unknown> = { title: body.title, description: body.description }
+  // Fusion avec l'existant : un envoi partiel ne doit pas effacer les champs
+  // absents. Ex. un envoi title/description/h1 sans searchConsole conserve le
+  // bloc Google Search Console déjà stocké (idem og, structuredData…). On lit
+  // la ligne actuelle, puis on n'écrase que les champs réellement fournis.
+  let existing: Record<string, unknown> = {}
+  try {
+    const cur = await fetch(
+      `${supabaseUrl}/rest/v1/seo?page=eq.${encodeURIComponent(body.page)}&select=data&limit=1`,
+      { headers: { apikey: serviceKey, authorization: `Bearer ${serviceKey}` } },
+    )
+    if (cur.ok) {
+      const rows = (await cur.json()) as { data?: Record<string, unknown> }[]
+      existing = rows[0]?.data ?? {}
+    }
+  } catch {
+    /* lecture impossible : on repart de l'existant vide, sans bloquer l'envoi */
+  }
+
+  const data: Record<string, unknown> = { ...existing, title: body.title, description: body.description }
   if (body.h1 !== undefined) data.h1 = body.h1
   if (body.keywords !== undefined) data.keywords = body.keywords
   if (body.og !== undefined) data.og = body.og
