@@ -15,6 +15,18 @@ import { AuthProvider } from './features/auth'
 
 const rootEl = document.getElementById('root')!
 
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
+if (window.location.pathname === ROUTES.home) {
+  if (window.location.hash) {
+    window.history.replaceState(null, '', ROUTES.home)
+  }
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }))
+}
+
 const tree = (
   <StrictMode>
     <BrowserRouter>

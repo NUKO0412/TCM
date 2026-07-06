@@ -16,6 +16,16 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <script>
+      (() => {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+        if (location.pathname === '/') {
+          if (location.hash) history.replaceState(null, '', location.pathname + location.search)
+          scrollTo(0, 0)
+          addEventListener('pageshow', () => scrollTo(0, 0), { once: true })
+        }
+      })()
+    </script>
     <title>TCM Agencement — menuiserie et agencement sur mesure à Lorient</title>
   </head>
   <body>
