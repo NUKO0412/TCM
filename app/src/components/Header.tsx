@@ -9,6 +9,8 @@ import { ROUTES } from '../config/routes'
 const roleLabel = (role: string | null) =>
   role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : ''
 
+const navHref = (href: string) => (href === '#' ? ROUTES.home : href)
+
 export function Header() {
   const { brand, nav, loginLabel } = useContent().header
   const { session, role, signOut } = useAuth()
@@ -31,7 +33,7 @@ export function Header() {
         </Link>
         <nav className="menu">
           {nav.map((l) => (
-            <a key={l.label} className="lnk" href={l.href}>
+            <a key={l.label} className="lnk" href={navHref(l.href)}>
               {l.label}
             </a>
           ))}
@@ -78,7 +80,7 @@ export function Header() {
               ✕
             </button>
             {nav.map((l) => (
-              <a key={l.label} href={l.href} onClick={() => setOpen(false)}>
+              <a key={l.label} href={navHref(l.href)} onClick={() => setOpen(false)}>
                 {l.label}
               </a>
             ))}
