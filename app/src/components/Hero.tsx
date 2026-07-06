@@ -34,23 +34,23 @@ export function Hero() {
       <span className="corner tr"></span>
       <div className="wrap hero-inner">
         {seoH1 ? (
-          <h1 className="eyebrow">{seoH1}</h1>
+          <h1 className="eyebrow hero-reveal hero-reveal-1">{seoH1}</h1>
         ) : (
-          <h1 className="eyebrow">
+          <h1 className="eyebrow hero-reveal hero-reveal-1">
             <EditableText sectionKey="hero" path="eyebrow" value={eyebrow} />
           </h1>
         )}
-        <p className="hero-title">
+        <p className="hero-title hero-reveal hero-reveal-2">
           <EditableText sectionKey="hero" path="title.pre" value={title.pre} />
           <i>
             <EditableText sectionKey="hero" path="title.em" value={title.em} />
           </i>
           <EditableText sectionKey="hero" path="title.post" value={title.post} />
         </p>
-        <p className="sub">
+        <p className="sub hero-reveal hero-reveal-3">
           <EditableText sectionKey="hero" path="sub" value={sub} multiline />
         </p>
-        <div className="cta-row">
+        <div className="cta-row hero-reveal hero-reveal-4">
           {ctas.map((c) =>
             c.kind === 'primary' ? (
               <a key={c.label} className="btn btn-primary" href={c.href}>

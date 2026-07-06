@@ -99,6 +99,12 @@ header.scrolled{background:rgba(16,14,11,.96);border-bottom:1px solid var(--line
 .hero .hero-title,.hero p.sub,.hero .eyebrow{text-shadow:0 2px 28px rgba(0,0,0,.62),0 1px 3px rgba(0,0,0,.5)}
 .hero p.sub{font-size:clamp(16px,1.6vw,20px);color:#E5DCC9;max-width:54ch;margin:26px 0 0;line-height:1.55}
 .hero .cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:38px;align-items:center}
+.hero-reveal{animation:hero-reveal-in 1.1s cubic-bezier(.2,.7,.2,1) both}
+.hero-reveal-1{animation-delay:.08s}
+.hero-reveal-2{animation-delay:.16s}
+.hero-reveal-3{animation-delay:.24s}
+.hero-reveal-4{animation-delay:.32s}
+@keyframes hero-reveal-in{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 .scroll-cue{position:absolute;right:32px;bottom:40px;z-index:3;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--muted);writing-mode:vertical-rl;display:flex;align-items:center;gap:14px;text-transform:uppercase}
 .scroll-cue::after{content:"";width:1px;height:54px;background:linear-gradient(var(--oak),transparent)}
 
