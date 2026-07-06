@@ -4,9 +4,9 @@
       .wm{font-family:Georgia,serif;font-weight:600}
       .mo{font-family:'Space Mono','Courier New',monospace}</style>
   </defs>
-  <circle cx="60" cy="60" r="60" fill="#16140F"/>
-  <circle cx="60" cy="60" r="56" fill="none" stroke="#C2904B" stroke-width="3"/>
-  <circle cx="60" cy="60" r="49" fill="none" stroke="#C2904B" stroke-width="1.5" opacity="0.55"/>
+  <circle cx="60" cy="60" r="53" fill="#16140F"/>
+  <circle cx="60" cy="60" r="49" fill="none" stroke="#C2904B" stroke-width="3"/>
+  <circle cx="60" cy="60" r="43" fill="none" stroke="#C2904B" stroke-width="1.5" opacity="0.55"/>
   <text x="60" y="67" text-anchor="middle" class="wm" font-size="30" fill="#F4EDDF">TCM</text>
   <line x1="46" y1="75" x2="74" y2="75" stroke="#C2904B" stroke-width="1.4" opacity="0.7"/>
   <text x="60" y="86" text-anchor="middle" class="mo" font-size="6" letter-spacing="1.6" fill="#D9AC63">LORIENT</text>
