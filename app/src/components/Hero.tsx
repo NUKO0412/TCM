@@ -2,6 +2,13 @@ import { useContent, useStore } from '../features/content'
 import { EditableImage, EditableText } from '../features/edit'
 import { Icon } from './IconDefs'
 
+const unsplashSrcSet = (src: string, widths: number[]) => {
+  if (!src.includes('images.unsplash.com')) return undefined
+  return widths
+    .map((w) => `${src.replace(/([?&])w=\d+/i, `$1w=${w}`)} ${w}w`)
+    .join(', ')
+}
+
 export function Hero() {
   const { bg, eyebrow, title, sub, ctas } = useContent().hero
   const { updateSection } = useStore()
@@ -14,6 +21,11 @@ export function Hero() {
         <EditableImage
           src={bg.src}
           alt={bg.alt}
+          srcSet={unsplashSrcSet(bg.src, [640, 960, 1280, 1600, 1900])}
+          sizes="100vw"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           onReplace={(url) => void updateSection('hero', 'bg.src', url)}
         />
       </div>
@@ -22,23 +34,23 @@ export function Hero() {
       <span className="corner tr"></span>
       <div className="wrap hero-inner">
         {seoH1 ? (
-          <h1 className="eyebrow reveal">{seoH1}</h1>
+          <h1 className="eyebrow">{seoH1}</h1>
         ) : (
-          <h1 className="eyebrow reveal">
+          <h1 className="eyebrow">
             <EditableText sectionKey="hero" path="eyebrow" value={eyebrow} />
           </h1>
         )}
-        <p className="hero-title reveal">
+        <p className="hero-title">
           <EditableText sectionKey="hero" path="title.pre" value={title.pre} />
           <i>
             <EditableText sectionKey="hero" path="title.em" value={title.em} />
           </i>
           <EditableText sectionKey="hero" path="title.post" value={title.post} />
         </p>
-        <p className="sub reveal">
+        <p className="sub">
           <EditableText sectionKey="hero" path="sub" value={sub} multiline />
         </p>
-        <div className="cta-row reveal">
+        <div className="cta-row">
           {ctas.map((c) =>
             c.kind === 'primary' ? (
               <a key={c.label} className="btn btn-primary" href={c.href}>

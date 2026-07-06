@@ -44,7 +44,7 @@ export function Footer() {
             const hasFaq = col.links.some((l) => l.label.toUpperCase() === 'FAQ')
             return (
               <div className="foot-col" key={col.title}>
-                <h4>{col.title}</h4>
+                <p className="foot-title">{col.title}</p>
                 {col.links.filter((l) => !HIDDEN_FOOTER_LINKS.has(l.label)).map((l) => {
                   const href = resolveHref(l)
                   return href.startsWith('/') ? (
@@ -62,7 +62,7 @@ export function Footer() {
             )
           })}
           <div className="foot-col">
-            <h4>Informations légales</h4>
+            <p className="foot-title">Informations légales</p>
             <Link to={ROUTES.legal}>Mentions légales</Link>
             <Link to={`${ROUTES.legal}#${LEGAL_IDS.confidentialite}`}>Politique de confidentialité</Link>
             <Link to={`${ROUTES.legal}#${LEGAL_IDS.cookies}`}>Politique de cookies</Link>

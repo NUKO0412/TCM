@@ -26,7 +26,7 @@ export async function uploadImage(file: File): Promise<string> {
 
   const name = `${crypto.randomUUID()}.${ext}`
   const { error } = await supabase.storage.from(BUCKET).upload(name, data, {
-    cacheControl: '3600',
+    cacheControl: '31536000',
     contentType,
     upsert: false,
   })

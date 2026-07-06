@@ -1,6 +1,13 @@
 import { useContent, useStore } from '../features/content'
 import { EditableImage, EditableText } from '../features/edit'
 
+const unsplashSrcSet = (src: string, widths: number[]) => {
+  if (!src.includes('images.unsplash.com')) return undefined
+  return widths
+    .map((w) => `${src.replace(/([?&])w=\d+/i, `$1w=${w}`)} ${w}w`)
+    .join(', ')
+}
+
 export function About() {
   const { eyebrow, heading, paragraph, feats, figure } = useContent().about
   const { updateSection } = useStore()
@@ -29,8 +36,11 @@ export function About() {
         <EditableImage
           src={figure.img.src}
           alt={figure.img.alt}
+          srcSet={unsplashSrcSet(figure.img.src, [480, 720, 960, 1100])}
+          sizes="(max-width: 1024px) calc(100vw - 48px), 548px"
           onReplace={(url) => void updateSection('about', 'figure.img.src', url)}
           loading="lazy"
+          decoding="async"
         />
         <span className="tick">
           <EditableText sectionKey="about" path="figure.tick" value={figure.tick} />

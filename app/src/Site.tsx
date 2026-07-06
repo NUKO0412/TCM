@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { useScrolledHeader } from './hooks/useScrolledHeader'
 import { useReveal } from './hooks/useReveal'
 import { useHideHeaderOnInput } from './hooks/useHideHeaderOnInput'
+import { useAuth } from './features/auth'
 import { ContentProvider } from './features/content'
-import { AdminBar, EditModeProvider, useEditMode } from './features/edit'
+import { EditModeProvider, useEditMode } from './features/edit'
 import { IconDefs } from './components/IconDefs'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
@@ -16,6 +17,8 @@ import { Zone } from './components/Zone'
 import { Faq } from './components/Faq'
 import { Contact } from './components/Contact'
 import { Footer } from './components/Footer'
+
+const AdminBar = lazy(() => import('./features/edit/AdminBar').then((m) => ({ default: m.AdminBar })))
 
 // Le contenu vient de Supabase ; le rendu reste identique au pixel pour le
 // visiteur. EditModeProvider n'expose le mode édition qu'aux éditeurs connectés.
@@ -53,19 +56,34 @@ function SiteInner() {
 
   return (
     <>
+      <a className="skip-link" href="#contenu">
+        Aller au contenu
+      </a>
       <Header />
-      <AdminBar />
-      <Hero />
-      <Credibility />
-      <About />
-      <Prestations />
-      <Methode />
-      <Realisations />
-      <Zone />
-      <Faq />
-      <Contact />
+      <AdminBarGate />
+      <main id="contenu" tabIndex={-1}>
+        <Hero />
+        <Credibility />
+        <About />
+        <Prestations />
+        <Methode />
+        <Realisations />
+        <Zone />
+        <Faq />
+        <Contact />
+      </main>
       <Footer />
       <IconDefs />
     </>
+  )
+}
+
+function AdminBarGate() {
+  const { session, role } = useAuth()
+  if (!(session && (role === 'admin' || role === 'super_admin'))) return null
+  return (
+    <Suspense fallback={null}>
+      <AdminBar />
+    </Suspense>
   )
 }

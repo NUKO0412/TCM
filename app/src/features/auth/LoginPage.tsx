@@ -76,8 +76,9 @@ export function LoginPage() {
         )}
 
         <div className="field">
-          <label>Email</label>
+          <label htmlFor="login-email">Email</label>
           <input
+            id="login-email"
             type="email"
             name="email"
             autoComplete="username"
@@ -89,9 +90,10 @@ export function LoginPage() {
 
         {mode === 'login' && (
           <div className="field">
-            <label>Mot de passe</label>
+            <label htmlFor="login-password">Mot de passe</label>
             <div style={passwordField}>
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 autoComplete="current-password"

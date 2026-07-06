@@ -1,12 +1,15 @@
 import { useRef, useState, type CSSProperties } from 'react'
 import { useEditMode } from './useEditMode'
-import { uploadImage } from '../../lib/storage'
 
 type Props = {
   src: string
   alt: string
   className?: string
   style?: CSSProperties
+  srcSet?: string
+  sizes?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
+  decoding?: 'async' | 'sync' | 'auto'
   onReplace: (url: string) => void
   // En lecture seule : clic sur l'image (ex. ouvrir un aperçu plein écran).
   onView?: () => void
@@ -23,6 +26,10 @@ export function EditableImage({
   alt,
   className,
   style,
+  srcSet,
+  sizes,
+  fetchPriority,
+  decoding,
   onReplace,
   onView,
   onFiles,
@@ -42,6 +49,7 @@ export function EditableImage({
     }
     setBusy(true)
     try {
+      const { uploadImage } = await import('../../lib/storage')
       onReplace(await uploadImage(files[0]))
     } catch (e) {
       console.error('upload image', e)
@@ -57,6 +65,10 @@ export function EditableImage({
         src={src}
         alt={alt}
         className={className}
+        srcSet={srcSet}
+        sizes={sizes}
+        fetchPriority={fetchPriority}
+        decoding={decoding}
         style={onView ? { ...style, cursor: 'zoom-in' } : style}
         onClick={onView}
         loading={loading}
@@ -64,7 +76,18 @@ export function EditableImage({
     )
   }
 
-  const img = <img src={src} alt={alt} className={className} style={style} />
+  const img = (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      srcSet={srcSet}
+      sizes={sizes}
+      fetchPriority={fetchPriority}
+      decoding={decoding}
+      style={style}
+    />
+  )
 
   return (
     <>

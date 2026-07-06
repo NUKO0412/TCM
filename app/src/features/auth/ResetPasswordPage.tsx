@@ -130,7 +130,7 @@ export function ResetPasswordPage() {
           hidden
         />
         <div className="field">
-          <label>Nouveau mot de passe</label>
+          <label htmlFor="new-password">Nouveau mot de passe</label>
           <div style={passwordField}>
             <input
               type={showPassword ? 'text' : 'password'}
@@ -154,7 +154,7 @@ export function ResetPasswordPage() {
           </div>
         </div>
         <div className="field">
-          <label>Confirmer le mot de passe</label>
+          <label htmlFor="confirm-password">Confirmer le mot de passe</label>
           <div style={passwordField}>
             <input
               type={showConfirm ? 'text' : 'password'}

@@ -2,16 +2,21 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { useStore, type StoreItem } from '../features/content'
 import { EditableImage, useEditMode } from '../features/edit'
-import { uploadImage } from '../lib/storage'
+import { supabaseRenderUrl, supabaseSrcSet } from '../lib/imageUrls'
 
 const s = (v: unknown) => (typeof v === 'string' ? v : '')
 
 type Photo = { src: string; alt: string }
 const MAX = 3
+const PUBLIC_SHOT_WIDTHS = [640, 900, 1200, 1440]
 
 // Formats de carte : Petite = s-b (2×1), Moyenne = s-f (2×2), Grande = s-a (4×2).
 const sizeLabel = (sp: string) => (sp === 's-a' ? 'Grande' : sp === 's-f' ? 'Moyenne' : 'Petite')
 const nextSpan = (sp: string) => (sp === 's-a' ? 's-b' : sp === 's-f' ? 's-a' : 's-f')
+const shotSizes = (sp: string) =>
+  sp === 's-a' || sp === 's-f' || sp === 's-g'
+    ? '(max-width: 560px) calc(100vw - 36px), (max-width: 1024px) calc(100vw - 48px), 820px'
+    : '(max-width: 560px) calc(100vw - 36px), (max-width: 1024px) calc((100vw - 64px) / 2), 410px'
 
 // Texte alternatif : alt de la photo si renseigné, sinon dérivé du titre/catégorie.
 function altFor(data: Record<string, unknown>, photoAlt: string): string {
@@ -44,6 +49,7 @@ function PublicCarousel({ item, onView }: CarouselProps) {
   const photos = readImages(item.data)
     .filter((p) => p.src)
     .map((p) => ({ src: p.src, alt: altFor(item.data, p.alt ?? '') }))
+  const sizes = shotSizes(s(item.data.span))
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: photos.length > 1 })
   const [sel, setSel] = useState(0)
   const dragged = useRef(false)
@@ -63,11 +69,14 @@ function PublicCarousel({ item, onView }: CarouselProps) {
   if (photos.length === 1) {
     return (
       <img
-        src={photos[0].src}
+        src={supabaseRenderUrl(photos[0].src, 1440)}
+        srcSet={supabaseSrcSet(photos[0].src, PUBLIC_SHOT_WIDTHS)}
+        sizes={sizes}
         alt={photos[0].alt}
         style={{ cursor: 'zoom-in' }}
         onClick={() => onView({ images: photos, index: 0 })}
         loading="lazy"
+        decoding="async"
       />
     )
   }
@@ -90,7 +99,9 @@ function PublicCarousel({ item, onView }: CarouselProps) {
           {photos.map((p, k) => (
             <div className="embla-slide" key={k}>
               <img
-                src={p.src}
+                src={supabaseRenderUrl(p.src, 1440)}
+                srcSet={supabaseSrcSet(p.src, PUBLIC_SHOT_WIDTHS)}
+                sizes={sizes}
                 alt={p.alt}
                 style={{ cursor: 'zoom-in' }}
                 onClick={() => {
@@ -98,6 +109,7 @@ function PublicCarousel({ item, onView }: CarouselProps) {
                   onView({ images: photos, index: k })
                 }}
                 loading="lazy"
+                decoding="async"
               />
             </div>
           ))}
@@ -121,9 +133,11 @@ function PublicCarousel({ item, onView }: CarouselProps) {
       />
       <div className="carousel-dots">
         {photos.map((_, k) => (
-          <span
+          <button
+            type="button"
             key={k}
             className={k === sel ? 'on' : ''}
+            aria-label={`Afficher la photo ${k + 1}`}
             onClick={(e) => {
               e.stopPropagation()
               emblaApi?.scrollTo(k)
@@ -164,6 +178,7 @@ function EditCarousel({ item, onView }: CarouselProps) {
     if (!files || !files.length) return
     setBusy(true)
     try {
+      const { uploadImage } = await import('../lib/storage')
       const uploaded: Photo[] = []
       for (const f of Array.from(files).slice(0, MAX)) {
         uploaded.push({ src: await uploadImage(f), alt: '' })
@@ -208,7 +223,13 @@ function EditCarousel({ item, onView }: CarouselProps) {
           <button className="carousel-arrow next" aria-label="Suivant" onClick={(e) => { e.stopPropagation(); go(1) }} />
           <div className="carousel-dots">
             {images.map((_, k) => (
-              <span key={k} className={k === i ? 'on' : ''} onClick={(e) => { e.stopPropagation(); setIdx(k) }} />
+              <button
+                type="button"
+                key={k}
+                className={k === i ? 'on' : ''}
+                aria-label={`Afficher la photo ${k + 1}`}
+                onClick={(e) => { e.stopPropagation(); setIdx(k) }}
+              />
             ))}
           </div>
         </>

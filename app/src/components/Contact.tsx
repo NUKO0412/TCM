@@ -99,8 +99,9 @@ export function Contact() {
         <form className="form" onSubmit={onSubmit}>
             <div className="row">
               <div className="field">
-                <label>Nom</label>
+                <label htmlFor="contact-lastName">Nom</label>
                 <input
+                  id="contact-lastName"
                   name="lastName"
                   autoComplete="family-name"
                   placeholder="Le Gall"
@@ -109,8 +110,9 @@ export function Contact() {
                 />
               </div>
               <div className="field">
-                <label>Prénom</label>
+                <label htmlFor="contact-firstName">Prénom</label>
                 <input
+                  id="contact-firstName"
                   name="firstName"
                   autoComplete="given-name"
                   placeholder="Yann"
@@ -121,8 +123,9 @@ export function Contact() {
             </div>
             <div className="row">
               <div className="field">
-                <label>Email</label>
+                <label htmlFor="contact-email">Email</label>
                 <input
+                  id="contact-email"
                   type="email"
                   name="email"
                   autoComplete="email"
@@ -133,8 +136,9 @@ export function Contact() {
                 />
               </div>
               <div className="field">
-                <label>Téléphone</label>
+                <label htmlFor="contact-phone">Téléphone</label>
                 <input
+                  id="contact-phone"
                   name="phone"
                   type="tel"
                   autoComplete="tel"
@@ -146,8 +150,9 @@ export function Contact() {
             </div>
             <div className="row">
               <div className="field">
-                <label>Ville</label>
+                <label htmlFor="contact-city">Ville</label>
                 <input
+                  id="contact-city"
                   name="city"
                   autoComplete="address-level2"
                   placeholder="Lorient"
@@ -156,8 +161,13 @@ export function Contact() {
                 />
               </div>
               <div className="field">
-                <label>Type de projet</label>
-                <select name="projectType" value={form.type_projet} onChange={set('type_projet')}>
+                <label htmlFor="contact-projectType">Type de projet</label>
+                <select
+                  id="contact-projectType"
+                  name="projectType"
+                  value={form.type_projet}
+                  onChange={set('type_projet')}
+                >
                   {projectTypes.map((t) => (
                     <option key={t}>{t}</option>
                   ))}
@@ -165,8 +175,9 @@ export function Contact() {
               </div>
             </div>
             <div className="field">
-              <label>Votre message</label>
+              <label htmlFor="contact-message">Votre message</label>
               <textarea
+                id="contact-message"
                 name="message"
                 placeholder="Décrivez votre projet, la pièce, les dimensions approximatives…"
                 value={form.message}

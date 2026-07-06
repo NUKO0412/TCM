@@ -1,0 +1,18 @@
+# TCM Agencement
+
+Site officiel de TCM Agencement, menuiserie et agencement sur mesure à Lorient, Lanester et dans le Morbihan.
+
+## Liens utiles
+
+- Accueil: https://www.tcmagencement.fr/
+- Prestations: https://www.tcmagencement.fr/#presta
+- Réalisations: https://www.tcmagencement.fr/#real
+- Zone d'intervention: https://www.tcmagencement.fr/#zone
+- Contact: https://www.tcmagencement.fr/#contact
+- Mentions légales: https://www.tcmagencement.fr/mentions-legales
+- Sitemap: https://www.tcmagencement.fr/sitemap.xml
+- Robots: https://www.tcmagencement.fr/robots.txt
+
+## Résumé
+
+TCM Agencement réalise des projets de menuiserie, cuisines, dressings, parquets, portes, bibliothèques, terrasses et agencements bois pour particuliers et professionnels.

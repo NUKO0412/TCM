@@ -58,7 +58,9 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
-    ;(async () => {
+    let timer: ReturnType<typeof window.setTimeout> | undefined
+
+    const load = async () => {
       const [s, i] = await Promise.all([
         supabase.from('content_sections').select('key,data'),
         supabase.from('content_items').select('id,collection,ord,data'),
@@ -71,11 +73,30 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       commitSections(s.data as SectionRow[])
       commitItems(i.data as ItemRow[])
       setReady(true)
-    })()
+    }
+
+    const startLoad = () => {
+      if (snapshot) {
+        timer = window.setTimeout(() => {
+          void load()
+        }, 1600)
+        return
+      }
+      void load()
+    }
+
+    if (snapshot && document.readyState !== 'complete') {
+      window.addEventListener('load', startLoad, { once: true })
+    } else {
+      startLoad()
+    }
+
     return () => {
       active = false
+      window.removeEventListener('load', startLoad)
+      if (timer) window.clearTimeout(timer)
     }
-  }, [commitSections, commitItems])
+  }, [commitSections, commitItems, snapshot])
 
   const content = useMemo<SiteContent | null>(
     () => (ready ? assemble(sections, items) : null),
