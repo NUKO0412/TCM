@@ -13,16 +13,22 @@ export function Header() {
   const { brand, nav, loginLabel } = useContent().header
   const { session, role, signOut } = useAuth()
   const [open, setOpen] = useState(false)
+  const goHome = () => {
+    setOpen(false)
+    if (window.location.pathname !== ROUTES.home) return
+    window.history.replaceState(null, '', ROUTES.home)
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }
   return (
     <header id="hd">
       <div className="wrap nav">
-        <div className="brand">
+        <Link className="brand" to={ROUTES.home} aria-label="Retour à l’accueil TCM Agencement" onClick={goHome}>
           <Logo />
           <div>
             <b>{brand.name}</b>
             <span>{brand.tagline}</span>
           </div>
-        </div>
+        </Link>
         <nav className="menu">
           {nav.map((l) => (
             <a key={l.label} className="lnk" href={l.href}>

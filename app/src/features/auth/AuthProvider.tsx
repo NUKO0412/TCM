@@ -1,86 +1,83 @@
-import { useEffect, useState, useCallback, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from '../../lib/supabase'
-import { ROUTES } from '../../config/routes'
+import { hasStoredSupabaseSession, hasSupabaseRecoveryTokens } from '../../lib/loadSupabase'
 import { AuthContext, type Role } from './auth-context'
 
 // Gère la session Supabase et résout le rôle depuis la table profiles.
 // admin et super_admin ont des droits identiques : le rôle est une étiquette.
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [shouldLoadAuthOnStart] = useState(() => hasStoredSupabaseSession() || hasSupabaseRecoveryTokens())
   const [session, setSession] = useState<Session | null>(null)
   const [role, setRole] = useState<Role | null>(null)
-  const [roleResolved, setRoleResolved] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  // Récupère le rôle du compte connecté (ou null). roleResolved distingue
-  // « rôle pas encore récupéré » de « rôle récupéré = aucun » (non-admin).
-  const loadRole = useCallback(async (s: Session | null) => {
-    setRoleResolved(false)
-    if (!s) {
-      setRole(null)
-      setRoleResolved(true)
-      return
-    }
-    try {
-      const { data } = await supabase.from('profiles').select('role').eq('id', s.user.id).maybeSingle()
-      setRole((data?.role as Role | undefined) ?? null)
-    } catch {
-      setRole(null)
-    } finally {
-      setRoleResolved(true)
-    }
-  }, [])
+  const [roleResolved, setRoleResolved] = useState(!shouldLoadAuthOnStart)
+  const [loading, setLoading] = useState(shouldLoadAuthOnStart)
+  const unsubscribeRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     let mounted = true
-    supabase.auth
-      .getSession()
-      .then(async ({ data }) => {
+    if (!shouldLoadAuthOnStart) {
+      return () => {
+        mounted = false
+      }
+    }
+
+    void import('./authApi').then(async (api) => {
+      if (!mounted) return
+      try {
+        const state = await api.getCurrentAuthState()
         if (!mounted) return
-        setSession(data.session)
-        await loadRole(data.session)
-      })
-      .catch(async () => {
+        setSession(state.session)
+        setRole(state.role)
+        setRoleResolved(true)
+      } catch {
         if (!mounted) return
         setSession(null)
-        await loadRole(null)
-      })
-      .finally(() => {
+        setRole(null)
+        setRoleResolved(true)
+      } finally {
         if (mounted) setLoading(false)
+      }
+      unsubscribeRef.current = await api.subscribeAuthState((nextSession, nextRole) => {
+        if (!mounted) return
+        setSession(nextSession)
+        setRole(nextRole)
+        setRoleResolved(true)
       })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s)
-      void loadRole(s)
     })
     return () => {
       mounted = false
-      sub.subscription.unsubscribe()
+      unsubscribeRef.current?.()
+      unsubscribeRef.current = null
     }
-  }, [loadRole])
+  }, [shouldLoadAuthOnStart])
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error?.message ?? null }
+    const result = await import('./authApi').then((api) => api.login(email, password))
+    if (!result.error) {
+      setSession(result.session)
+      setRole(result.role)
+      setRoleResolved(true)
+    }
+    return { error: result.error }
   }, [])
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    await import('./authApi').then((api) => api.signOutSession())
+    setSession(null)
+    setRole(null)
+    setRoleResolved(true)
   }, [])
 
   // « Mot de passe oublié » : Supabase envoie un email dont le lien ramène sur
   // /reinitialisation (page qui exploite la session de récupération créée au retour).
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}${ROUTES.resetPassword}`,
-    })
-    return { error: error?.message ?? null }
+    return import('./authApi').then((api) => api.sendPasswordReset(email))
   }, [])
 
   // Définit le nouveau mot de passe du compte courant (session de récupération
   // ou session normale). Utilisé par la page /reinitialisation.
   const updatePassword = useCallback(async (password: string) => {
-    const { error } = await supabase.auth.updateUser({ password })
-    return { error: error?.message ?? null }
+    return import('./authApi').then((api) => api.updateCurrentPassword(password))
   }, [])
 
   return (

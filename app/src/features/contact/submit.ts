@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase'
+import { loadSupabase } from '../../lib/loadSupabase'
 
 export interface ContactPayload {
   nom: string
@@ -18,6 +18,7 @@ export interface ContactPayload {
 // (notified reste false, visible dans le back-office, ré-essayable).
 export async function submitContactRequest(payload: ContactPayload) {
   const id = crypto.randomUUID()
+  const supabase = await loadSupabase()
   const { error } = await supabase.from('contact_requests').insert({ ...payload, id })
   if (error) throw error
 

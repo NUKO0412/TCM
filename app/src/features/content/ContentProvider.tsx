@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, useCallback, useRef, type ReactNode } from 'react'
-import { supabase } from '../../lib/supabase'
 import { assemble } from './assemble'
 import { ContentContext } from './content-context'
 import { ContentStoreContext, type StoreItem } from './store-context'
@@ -27,8 +26,6 @@ function setPath(target: unknown, path: string, value: unknown): unknown {
   }
   return { ...((target as Record<string, unknown>) ?? {}), [head]: nextChild }
 }
-
-const now = () => new Date().toISOString()
 
 export function ContentProvider({ children }: { children: ReactNode }) {
   const { session, role } = useAuth()
@@ -65,17 +62,15 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     let timer: ReturnType<typeof window.setTimeout> | undefined
 
     const load = async () => {
-      const [s, i] = await Promise.all([
-        supabase.from('content_sections').select('key,data'),
-        supabase.from('content_items').select('id,collection,ord,data'),
-      ])
+      const { loadContentRows } = await import('./contentApi')
+      const result = await loadContentRows()
       if (!active) return
-      if (s.error || i.error) {
-        setError(s.error?.message ?? i.error?.message ?? 'Erreur de chargement')
+      if (result.error) {
+        setError(result.error)
         return
       }
-      commitSections(s.data as SectionRow[])
-      commitItems(i.data as ItemRow[])
+      commitSections(result.sections)
+      commitItems(result.items)
       setReady(true)
     }
 
@@ -116,10 +111,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       if (!cur) return
       const nextData = setPath(cur.data, path, value) as Record<string, unknown>
       commitSections(sectionsRef.current.map((r) => (r.key === key ? { ...r, data: nextData } : r)))
-      const { error } = await supabase
-        .from('content_sections')
-        .update({ data: nextData, updated_at: now() })
-        .eq('key', key)
+      const { persistSection } = await import('./contentApi')
+      const { error } = await persistSection(key, nextData)
       if (error) console.error('updateSection', error.message)
     },
     [commitSections],
@@ -131,10 +124,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       if (!cur) return
       const nextData = { ...cur.data, [field]: value }
       commitItems(itemsRef.current.map((r) => (r.id === id ? { ...r, data: nextData } : r)))
-      const { error } = await supabase
-        .from('content_items')
-        .update({ data: nextData, updated_at: now() })
-        .eq('id', id)
+      const { persistItem } = await import('./contentApi')
+      const { error } = await persistItem(id, nextData)
       if (error) console.error('updateItem', error.message)
     },
     [commitItems],
@@ -144,11 +135,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     async (collection: string, data: Record<string, unknown>) => {
       const ord =
         itemsRef.current.filter((r) => r.collection === collection).reduce((m, r) => Math.max(m, r.ord), -1) + 1
-      const { data: inserted, error } = await supabase
-        .from('content_items')
-        .insert({ collection, ord, data })
-        .select('id,collection,ord,data')
-        .single()
+      const { insertItem } = await import('./contentApi')
+      const { data: inserted, error } = await insertItem(collection, ord, data)
       if (error || !inserted) {
         console.error('addItem', error?.message)
         return
@@ -161,7 +149,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const removeItem = useCallback(
     async (id: string) => {
       commitItems(itemsRef.current.filter((r) => r.id !== id))
-      const { error } = await supabase.from('content_items').delete().eq('id', id)
+      const { deleteItem } = await import('./contentApi')
+      const { error } = await deleteItem(id)
       if (error) console.error('removeItem', error.message)
     },
     [commitItems],
@@ -176,9 +165,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
             : r,
         ),
       )
-      const results = await Promise.all(
-        orderedIds.map((id, ord) => supabase.from('content_items').update({ ord, updated_at: now() }).eq('id', id)),
-      )
+      const { persistItemOrder } = await import('./contentApi')
+      const results = await persistItemOrder(orderedIds)
       const failed = results.find((r) => r.error)
       if (failed?.error) console.error('reorderItems', failed.error.message)
     },

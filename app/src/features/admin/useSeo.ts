@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { loadSupabase } from '../../lib/loadSupabase'
 import type { SeoData } from '../../config/business'
 
 // Lecture seule de la ligne SEO d'une page (par défaut « / »).
@@ -17,6 +17,7 @@ export function useSeo(page = '/') {
   useEffect(() => {
     let active = true
     void (async () => {
+      const supabase = await loadSupabase()
       const { data, error } = await supabase
         .from('seo')
         .select('data, updated_at')

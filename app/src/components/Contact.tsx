@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useContent } from '../features/content'
 import { EditableText, useEditMode } from '../features/edit'
-import { submitContactRequest } from '../features/contact'
 import { Icon } from './IconDefs'
 
 // Téléphone -> lien d'appel, email -> lien mail (cliquables hors édition).
@@ -28,6 +27,7 @@ export function Contact() {
     if (!form.email.trim()) return
     setStatus('sending')
     try {
+      const { submitContactRequest } = await import('../features/contact')
       await submitContactRequest(form)
       setStatus('sent')
       // « Demande envoyée » sur le bouton ~3 s, puis on vide le formulaire.

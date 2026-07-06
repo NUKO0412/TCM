@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { loadSupabase } from './loadSupabase'
 
 const BUCKET = 'site-media'
 
@@ -25,6 +25,7 @@ export async function uploadImage(file: File): Promise<string> {
   }
 
   const name = `${crypto.randomUUID()}.${ext}`
+  const supabase = await loadSupabase()
   const { error } = await supabase.storage.from(BUCKET).upload(name, data, {
     cacheControl: '31536000',
     contentType,

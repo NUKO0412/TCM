@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../../lib/supabase'
+import { loadSupabase } from '../../lib/loadSupabase'
 import { useAuth } from './useAuth'
 import { ROUTES } from '../../config/routes'
 
@@ -34,8 +34,10 @@ export function ResetPasswordPage() {
 
     let cancelled = false
 
-    supabase.auth
-      .setSession({ access_token: accessToken, refresh_token: refreshToken })
+    loadSupabase()
+      .then((supabase) =>
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }),
+      )
       .then(({ error }) => {
         if (cancelled) return
         if (error) {
