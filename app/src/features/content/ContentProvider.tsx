@@ -5,6 +5,7 @@ import { ContentContext } from './content-context'
 import { ContentStoreContext, type StoreItem } from './store-context'
 import type { SectionRow, ItemRow } from './rows'
 import type { SiteContent } from '../../data/types'
+import { useAuth } from '../auth'
 
 // Deep-set immuable, compatible objets ET tableaux.
 // setPath({a:{b:1}}, 'a.b', 2) -> {a:{b:2}} ; setPath({f:[{t:'x'}]}, 'f.0.t', 'y')
@@ -30,6 +31,9 @@ function setPath(target: unknown, path: string, value: unknown): unknown {
 const now = () => new Date().toISOString()
 
 export function ContentProvider({ children }: { children: ReactNode }) {
+  const { session, role } = useAuth()
+  const canRefresh = Boolean(session && (role === 'admin' || role === 'super_admin'))
+
   // Photo des données figée au build (index.html) : permet d'afficher le contenu
   // dès le premier rendu, identique au HTML pré-rendu (hydratation sans flash).
   // Absente en dev ou si le pré-rendu a échoué → comportement d'origine (vide
@@ -76,6 +80,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
 
     const startLoad = () => {
+      if (snapshot && !canRefresh) return
       if (snapshot) {
         timer = window.setTimeout(() => {
           void load()
@@ -96,7 +101,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('load', startLoad)
       if (timer) window.clearTimeout(timer)
     }
-  }, [commitSections, commitItems, snapshot])
+  }, [canRefresh, commitSections, commitItems, snapshot])
 
   const content = useMemo<SiteContent | null>(
     () => (ready ? assemble(sections, items) : null),
