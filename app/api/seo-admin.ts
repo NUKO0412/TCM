@@ -28,6 +28,10 @@ function cleanKeywords(value: unknown): string[] | undefined {
   return keywords.length ? keywords : undefined
 }
 
+function mergeObject(existing: unknown, incoming: Record<string, unknown>): Record<string, unknown> {
+  return { ...(isPlainObject(existing) ? existing : {}), ...incoming }
+}
+
 async function getUserId(supabaseUrl: string, anonKey: string, token: string): Promise<string | null> {
   const res = await fetch(`${supabaseUrl}/auth/v1/user`, {
     headers: { apikey: anonKey, authorization: `Bearer ${token}` },
@@ -105,8 +109,8 @@ export default async function handler(request: Request): Promise<Response> {
   if (canonical) data.canonical = canonical
   const keywords = cleanKeywords(body.keywords)
   if (keywords) data.keywords = keywords
-  if (isPlainObject(body.og)) data.og = body.og
-  if (isPlainObject(body.twitter)) data.twitter = body.twitter
+  if (isPlainObject(body.og)) data.og = mergeObject(existing.og, body.og)
+  if (isPlainObject(body.twitter)) data.twitter = mergeObject(existing.twitter, body.twitter)
   if (isPlainObject(body.structuredData)) data.structuredData = body.structuredData
   if (isPlainObject(body.geo)) data.geo = body.geo
 

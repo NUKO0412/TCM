@@ -1,13 +1,49 @@
+import { useState } from 'react'
 import type { ChangeEvent, CSSProperties } from 'react'
 import type { SeoData } from '../../config/business'
 import { card, label } from './seoPageStyles'
 
-export function SearchConsoleBlock({ data }: { data?: NonNullable<SeoData['searchConsole']> }) {
+export function HelpTip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <span style={helpWrap}>
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label="Aide"
+        aria-expanded={open}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onClick={(event) => {
+          event.preventDefault()
+          setOpen((visible) => !visible)
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            setOpen((visible) => !visible)
+          }
+        }}
+        style={helpDot}
+      >
+        i
+      </span>
+      {open && <span style={helpBubble}>{text}</span>}
+    </span>
+  )
+}
+
+export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData['searchConsole']>; help: string }) {
   const indexed =
     data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
   return (
     <div style={{ ...card, padding: 16, marginTop: 18 }}>
-      <div style={label}>Google Search Console</div>
+      <div style={labelRow}>
+        <span style={label}>Google Search Console</span>
+        <HelpTip text={help} />
+      </div>
       <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
         <FieldLine label="Statut" value={indexed} />
         <FieldLine label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
@@ -41,6 +77,7 @@ function FieldLine({ label: l, value }: { label: string; value?: string | null }
 
 export function InputBlock({
   label: l,
+  help,
   value,
   onChange,
   readOnly,
@@ -49,6 +86,7 @@ export function InputBlock({
   rows = 3,
 }: {
   label: string
+  help: string
   value: string
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   readOnly?: boolean
@@ -69,7 +107,10 @@ export function InputBlock({
   }
   return (
     <label style={{ ...card, display: 'block', padding: 16 }}>
-      <span style={label}>{l}</span>
+      <span style={labelRow}>
+        <span style={label}>{l}</span>
+        <HelpTip text={help} />
+      </span>
       {multiline ? (
         <textarea value={value} onChange={onChange} readOnly={readOnly} rows={rows} style={fieldStyle} />
       ) : (
@@ -77,4 +118,40 @@ export function InputBlock({
       )}
     </label>
   )
+}
+
+const labelRow: CSSProperties = { display: 'flex', alignItems: 'center', gap: 8, position: 'relative' }
+const helpWrap: CSSProperties = { position: 'relative', display: 'inline-flex', alignItems: 'center' }
+const helpDot: CSSProperties = {
+  width: 18,
+  height: 18,
+  display: 'inline-grid',
+  placeItems: 'center',
+  borderRadius: '50%',
+  border: '1px solid var(--line-d)',
+  color: 'var(--oak-2)',
+  fontFamily: 'var(--mono)',
+  fontSize: 11,
+  lineHeight: 1,
+  cursor: 'help',
+  background: 'rgba(255,255,255,.04)',
+}
+const helpBubble: CSSProperties = {
+  position: 'absolute',
+  zIndex: 20,
+  top: 24,
+  left: 0,
+  width: 320,
+  maxWidth: 'min(78vw, 320px)',
+  padding: '10px 12px',
+  borderRadius: 10,
+  border: '1px solid var(--line-d)',
+  background: 'var(--ink)',
+  color: '#E5DCC9',
+  boxShadow: '0 18px 40px rgba(0,0,0,.28)',
+  fontFamily: 'var(--font)',
+  fontSize: 13,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+  textTransform: 'none',
 }
