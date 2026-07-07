@@ -4,14 +4,16 @@
  * Lancé après `vite build` (voir le script `build` de package.json).
  *
  * Lit la ligne public.seo (page "/") en lecture publique (clé anon) et construit
- * les balises head + le JSON-LD LocalBusiness depuis src/config/business.ts.
- * Résilient : si la base est injoignable, on injecte le repli et le build ne casse pas.
+ * les balises head + le JSON-LD depuis src/config/business.ts.
+ * Résilient : si la base est injoignable, on injecte le snapshot SEO versionné
+ * validé côté TCM et le build ne casse pas.
  * Ne touche pas au noindex.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { buildHead, type SeoData } from '../src/config/business.ts'
+import { SEO_PAGE } from '../src/config/seoSnapshot.ts'
 
 const here = dirname(fileURLToPath(import.meta.url)) // app/scripts
 
@@ -30,7 +32,7 @@ const FAQ_END = '<!-- faq:end -->'
 async function fetchSeo(): Promise<SeoData | null> {
   if (!url || !anon) return null
   try {
-    const res = await fetch(`${url}/rest/v1/seo?page=eq.${encodeURIComponent('/')}&select=data&limit=1`, {
+    const res = await fetch(`${url}/rest/v1/seo?page=eq.${encodeURIComponent(SEO_PAGE)}&select=data&limit=1`, {
       headers: { apikey: anon, authorization: `Bearer ${anon}` },
     })
     if (!res.ok) return null

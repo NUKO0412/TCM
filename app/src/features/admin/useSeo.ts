@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { loadSupabase } from '../../lib/loadSupabase'
 import type { SeoData } from '../../config/business'
 
-// Lecture seule de la ligne SEO d'une page (par défaut « / »).
-// La table seo est lisible en anon (policy seo_read) ; aucune écriture ici.
+// Lecture de la ligne SEO d'une page (par défaut « / »).
+// La table seo est lisible en anon ; l'écriture passe par /api/seo-admin
+// avec vérification serveur du rôle super_admin.
 export interface SeoRow {
   data: SeoData
   updated_at: string

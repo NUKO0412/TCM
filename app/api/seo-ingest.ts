@@ -1,6 +1,7 @@
-// Point de réception de la SEO envoyée par Hubelly.
-// POST /api/seo-ingest — protégé par SEO_INGEST_KEY. Écrit dans public.seo (upsert sur page)
-// avec la clé service Supabase. Tous les secrets viennent de l'environnement serveur, jamais du front.
+// Ancien point de réception SEO externe. Conservé temporairement pour rollback,
+// mais désactivé par défaut : la SEO/GEO se gère dans TCM via /api/seo-admin.
+import { getSupabaseServerEnv, isText, reply } from './_shared'
+
 export const config = { runtime: 'edge' }
 
 type Incoming = {
@@ -14,19 +15,15 @@ type Incoming = {
   searchConsole?: unknown
 }
 
-function reply(status: number, body: Record<string, unknown>): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
-  })
-}
-
-const isText = (v: unknown): v is string => typeof v === 'string' && v.trim() !== ''
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return reply(405, { error: 'method_not_allowed' })
+
+  if (process.env.ALLOW_EXTERNAL_SEO_INGEST !== 'true') {
+    return reply(410, { error: 'external_seo_ingest_disabled', message: 'TCM SEO is administered internally.' })
+  }
 
   const ingestKey = process.env.SEO_INGEST_KEY
   const auth = request.headers.get('authorization') ?? ''
@@ -58,10 +55,9 @@ export default async function handler(request: Request): Promise<Response> {
     return reply(400, { error: 'searchConsole_must_be_object' })
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
-  // la clé service est câblée selon le projet sous l'un ou l'autre nom
-  const serviceKey = process.env.SUPABASE_SERVICE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceKey) return reply(500, { error: 'server_misconfigured' })
+  const supabaseEnv = getSupabaseServerEnv()
+  if (!supabaseEnv) return reply(500, { error: 'server_misconfigured' })
+  const { supabaseUrl, serviceKey } = supabaseEnv
 
   // Fusion avec l'existant : un envoi partiel ne doit pas effacer les champs
   // absents. Ex. un envoi title/description/h1 sans searchConsole conserve le

@@ -16,6 +16,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { SEO_PAGE, seoSnapshot } from '../src/config/seoSnapshot.ts'
 
 const here = dirname(fileURLToPath(import.meta.url)) // app/scripts
 
@@ -48,19 +49,20 @@ async function fetchSnapshot(): Promise<Snapshot | null> {
   return { sections, items }
 }
 
-// Le champ h1 (SEO) injecté par Hubelly, lu dans la table seo (page "/").
+// Le champ h1 SEO est administré dans TCM, lu depuis public.seo (page "/").
+// Si la base est indisponible, on utilise le snapshot versionné validé.
 async function fetchSeoH1(): Promise<string | undefined> {
-  if (!url || !anon) return undefined
+  if (!url || !anon) return seoSnapshot.h1
   try {
-    const res = await fetch(`${url}/rest/v1/seo?page=eq.${encodeURIComponent('/')}&select=data&limit=1`, {
+    const res = await fetch(`${url}/rest/v1/seo?page=eq.${encodeURIComponent(SEO_PAGE)}&select=data&limit=1`, {
       headers: { apikey: anon, authorization: `Bearer ${anon}` },
     })
-    if (!res.ok) return undefined
+    if (!res.ok) return seoSnapshot.h1
     const rows = (await res.json()) as { data?: { h1?: string } }[]
     const h1 = rows[0]?.data?.h1
-    return typeof h1 === 'string' && h1.trim() ? h1 : undefined
+    return typeof h1 === 'string' && h1.trim() ? h1 : seoSnapshot.h1
   } catch {
-    return undefined
+    return seoSnapshot.h1
   }
 }
 
@@ -79,9 +81,9 @@ async function main() {
   // ContentProvider lit cette photo au rendu (serveur et client).
   globalThis.__TCM_CONTENT__ = snapshot
 
-  // Le H1 est du SEO (Hubelly) : on le pose en global pour que le rendu serveur
-  // (puis client) affiche le H1 envoyé par Hubelly. Repli : Hero retombe sur
-  // l'étiquette éditable si absent.
+  // Le H1 est du SEO sensible : on le pose en global pour que le rendu serveur
+  // (puis client) affiche la valeur administrée dans TCM, avec snapshot validé
+  // en secours.
   const seoH1 = await fetchSeoH1()
   globalThis.__TCM_SEO__ = seoH1 ? { h1: seoH1 } : undefined
 
@@ -107,8 +109,8 @@ async function main() {
   const seed = `<script>window.__TCM_CONTENT__=${safeJson(snapshot)}</script>`
   html = html.replace('</head>', `  ${seed}\n  </head>`)
 
-  // 3) embarque le H1 SEO (Hubelly) pour que le H1 côté client corresponde au
-  //    H1 pré-rendu (hydratation propre). Absent → Hero garde le repli.
+  // 3) embarque le H1 SEO pour que le H1 côté client corresponde au H1
+  //    pré-rendu (hydratation propre).
   if (seoH1) {
     const seoSeed = `<script>window.__TCM_SEO__=${safeJson({ h1: seoH1 })}</script>`
     html = html.replace('</head>', `  ${seoSeed}\n  </head>`)

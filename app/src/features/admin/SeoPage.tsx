@@ -1,15 +1,37 @@
+import { useState } from 'react'
+import type { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { ROUTES } from '../../config/routes'
-import { useSeo } from './useSeo'
+import { SEO_PAGE } from '../../config/seoSnapshot'
+import { useSeo, type SeoRow } from './useSeo'
+import { InputBlock, SearchConsoleBlock } from './SeoFormFields'
+import { toSeoForm, splitSeoList, type SeoFormState } from './seoForm'
+import { bar, card, ghostBtn, label, muted, page } from './seoPageStyles'
 
-// Onglet SEO en lecture seule : l'éditeur (admin ou super_admin, droits identiques)
-// voit la SEO reçue de Hubelly (métas, mots-clés, OG, date) ET le bloc Intégration
-// (point de réception). La clé API reste un secret serveur, jamais affichée ici.
 export function SeoPage() {
-  const { signOut } = useAuth()
-  const { row, loading, error } = useSeo('/')
+  const { row, loading, error } = useSeo(SEO_PAGE)
+  const formKey = loading ? 'loading' : row?.updated_at ?? 'snapshot'
+  return <SeoPageContent key={formKey} row={row} loading={loading} error={error} />
+}
+
+function SeoPageContent({
+  row,
+  loading,
+  error,
+}: {
+  row: SeoRow | null
+  loading: boolean
+  error: string | null
+}) {
+  const { signOut, session, role } = useAuth()
   const seo = row?.data ?? null
+  const isSuperAdmin = role === 'super_admin'
+  const [form, setForm] = useState<SeoFormState>(() => toSeoForm(seo))
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
   const received = Boolean(row)
   const date = row
     ? new Date(row.updated_at).toLocaleString('fr-FR', {
@@ -21,6 +43,67 @@ export function SeoPage() {
       })
     : null
 
+  const update = (field: keyof SeoFormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }))
+  }
+
+  const save = async () => {
+    if (!isSuperAdmin || saving) return
+    setSaving(true)
+    setMessage(null)
+    setSaveError(null)
+    try {
+      let structuredData: Record<string, unknown>
+      try {
+        structuredData = JSON.parse(form.structuredData) as Record<string, unknown>
+      } catch {
+        setSaveError('Le JSON-LD est invalide.')
+        return
+      }
+
+      const res = await fetch('/api/seo-admin', {
+        method: 'PUT',
+        headers: {
+          authorization: `Bearer ${session?.access_token ?? ''}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          page: form.page || SEO_PAGE,
+          title: form.title,
+          h1: form.h1,
+          description: form.description,
+          keywords: splitSeoList(form.keywords),
+          canonical: form.canonical,
+          og: { title: form.ogTitle, description: form.ogDescription, image: form.ogImage },
+          twitter: {
+            title: form.twitterTitle,
+            description: form.twitterDescription,
+            image: form.twitterImage,
+          },
+          structuredData,
+          geo: {
+            areaServed: splitSeoList(form.geoAreaServed),
+            services: splitSeoList(form.geoServices),
+          },
+        }),
+      })
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string; rebuild?: string } | null
+      if (!res.ok || !data?.ok) {
+        setSaveError(data?.error ?? `Sauvegarde refusée (HTTP ${res.status}).`)
+        return
+      }
+      if (data.rebuild === 'triggered') {
+        setMessage('SEO sauvegardée. Rebuild TCM déclenché.')
+      } else if (data.rebuild === 'failed') {
+        setSaveError('SEO sauvegardée, mais le rebuild TCM a échoué : le HTML public peut rester sur les anciennes valeurs.')
+      } else {
+        setMessage('SEO sauvegardée. Rebuild non configuré : lancer un déploiement contrôlé pour publier le HTML.')
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <main style={page}>
       <div style={bar}>
@@ -28,7 +111,9 @@ export function SeoPage() {
           <span className="eyebrow" style={{ color: 'var(--oak-2)' }}>
             Back-office
           </span>
-          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 28, marginTop: 8 }}>SEO · lecture seule</h1>
+          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 28, marginTop: 8 }}>
+            SEO · {isSuperAdmin ? 'super admin' : 'lecture seule'}
+          </h1>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <Link className="btn-login" to={ROUTES.adminMessages}>
@@ -49,117 +134,103 @@ export function SeoPage() {
       {!loading && !error && (
         <>
           <div style={{ ...card, padding: 16, marginBottom: 16, borderColor: received ? 'var(--oak)' : 'var(--line-d)' }}>
-            <div style={label}>État de la connexion</div>
+            <div style={label}>Source SEO TCM</div>
             <p style={{ marginTop: 6, color: '#E5DCC9', fontSize: 15, lineHeight: 1.5 }}>
               {received
-                ? `Données reçues — dernière mise à jour le ${date}.`
-                : "Aucune donnée reçue pour l'instant : le site affiche le SEO de repli. Cette page se remplira à la première réception de Hubelly."}
+                ? `Données internes TCM chargées — dernière mise à jour le ${date}.`
+                : 'Aucune ligne SEO en base : le snapshot versionné validé sert de repli.'}
             </p>
+            {!isSuperAdmin && (
+              <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13, lineHeight: 1.5 }}>
+                Votre rôle peut consulter ces valeurs, mais seule une session super admin peut les modifier.
+              </p>
+            )}
           </div>
 
-          <div style={{ display: 'grid', gap: 10 }}>
-            <FieldBlock label="Titre" value={seo?.title} />
-            <FieldBlock label="H1" value={seo?.h1} />
-            <FieldBlock label="Description" value={seo?.description} />
-            <KeywordsBlock keywords={seo?.keywords} />
-            <FieldBlock label="OG · titre" value={seo?.og?.title} />
-            <FieldBlock label="OG · description" value={seo?.og?.description} />
-            <FieldBlock label="OG · image" value={seo?.og?.image} mono />
-            <FieldBlock label="Données structurées" value={seo?.structuredData ? 'reçues par injection' : undefined} />
-            <SearchConsoleBlock data={seo?.searchConsole} />
+          <div style={{ display: 'grid', gap: 12 }}>
+            <InputBlock label="Page" value={form.page} onChange={update('page')} readOnly />
+            <InputBlock label="Title" value={form.title} onChange={update('title')} readOnly={!isSuperAdmin} />
+            <InputBlock label="H1" value={form.h1} onChange={update('h1')} readOnly={!isSuperAdmin} />
+            <InputBlock
+              label="Meta description"
+              value={form.description}
+              onChange={update('description')}
+              readOnly={!isSuperAdmin}
+              multiline
+            />
+            <InputBlock label="Keywords" value={form.keywords} onChange={update('keywords')} readOnly={!isSuperAdmin} />
+            <InputBlock label="Canonical" value={form.canonical} onChange={update('canonical')} readOnly={!isSuperAdmin} />
+            <InputBlock label="OG title" value={form.ogTitle} onChange={update('ogTitle')} readOnly={!isSuperAdmin} />
+            <InputBlock
+              label="OG description"
+              value={form.ogDescription}
+              onChange={update('ogDescription')}
+              readOnly={!isSuperAdmin}
+              multiline
+            />
+            <InputBlock label="OG image" value={form.ogImage} onChange={update('ogImage')} readOnly={!isSuperAdmin} mono />
+            <InputBlock
+              label="Twitter title"
+              value={form.twitterTitle}
+              onChange={update('twitterTitle')}
+              readOnly={!isSuperAdmin}
+            />
+            <InputBlock
+              label="Twitter description"
+              value={form.twitterDescription}
+              onChange={update('twitterDescription')}
+              readOnly={!isSuperAdmin}
+              multiline
+            />
+            <InputBlock
+              label="Twitter image"
+              value={form.twitterImage}
+              onChange={update('twitterImage')}
+              readOnly={!isSuperAdmin}
+              mono
+            />
+            <InputBlock
+              label="JSON-LD"
+              value={form.structuredData}
+              onChange={update('structuredData')}
+              readOnly={!isSuperAdmin}
+              multiline
+              mono
+              rows={12}
+            />
+            <InputBlock
+              label="Zones GEO ciblées"
+              value={form.geoAreaServed}
+              onChange={update('geoAreaServed')}
+              readOnly={!isSuperAdmin}
+            />
+            <InputBlock
+              label="Services GEO principaux"
+              value={form.geoServices}
+              onChange={update('geoServices')}
+              readOnly={!isSuperAdmin}
+            />
           </div>
 
-          <div style={{ ...card, padding: 16, marginTop: 20 }}>
-            <div style={label}>Intégration · SEO</div>
-            <div style={{ marginTop: 12, display: 'grid', gap: 14 }}>
-              <FieldBlock label="Point de réception" value="https://www.tcmagencement.fr/api/seo-ingest" mono flat />
-              <FieldBlock label="Méthode" value="POST · en-tête Authorization: Bearer <clé>" mono flat />
-              <div>
-                <div style={label}>Clé API</div>
-                <div style={{ fontSize: 14, color: '#E5DCC9', marginTop: 4, lineHeight: 1.5 }}>
-                  Stockée comme secret Vercel <code style={code}>SEO_INGEST_KEY</code> — jamais affichée ici.
-                </div>
-              </div>
+          {isSuperAdmin && (
+            <div style={{ ...card, padding: 16, marginTop: 18 }}>
+              <button
+                type="button"
+                className="btn-login"
+                onClick={() => void save()}
+                disabled={saving || !form.title.trim() || !form.description.trim() || !form.h1.trim()}
+                style={{ cursor: saving ? 'wait' : 'pointer' }}
+              >
+                {saving ? 'Sauvegarde…' : 'Sauvegarder la SEO'}
+              </button>
+              {message && <p style={{ ...muted, marginTop: 12, color: '#9fd5aa' }}>{message}</p>}
+              {saveError && <p style={{ ...muted, marginTop: 12, color: '#e0a070' }}>{saveError}</p>}
             </div>
-          </div>
+          )}
+
+          <SearchConsoleBlock data={seo?.searchConsole} />
         </>
       )}
     </main>
   )
 }
-
-function SearchConsoleBlock({ data }: { data?: NonNullable<import('../../config/business').SeoData['searchConsole']> }) {
-  const indexed =
-    data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
-  return (
-    <div style={{ ...card, padding: 16 }}>
-      <div style={label}>Google Search Console</div>
-      <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
-        <FieldBlock label="Statut" value={indexed} flat />
-        <FieldBlock label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} flat />
-        <FieldBlock label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} flat />
-        <FieldBlock label="Position moyenne" value={data?.position == null ? undefined : String(data.position)} flat />
-        {data?.topQueries?.length ? (
-          <div>
-            <div style={label}>Top requêtes</div>
-            <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
-              {data.topQueries.map((q) => (
-                <div key={q.query} style={{ fontSize: 13, color: '#E5DCC9', fontFamily: 'var(--mono)' }}>
-                  {q.query} · {q.clicks ?? 0} clic(s) · {q.impressions ?? 0} impression(s)
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-
-function FieldBlock({ label: l, value, mono, flat }: { label: string; value?: string | null; mono?: boolean; flat?: boolean }) {
-  return (
-    <div style={flat ? undefined : { ...card, padding: 16 }}>
-      <div style={label}>{l}</div>
-      <div
-        style={{
-          fontSize: 15,
-          color: value ? '#E5DCC9' : 'var(--muted)',
-          marginTop: 4,
-          lineHeight: 1.5,
-          fontFamily: mono ? 'var(--mono)' : 'inherit',
-          wordBreak: mono ? 'break-all' : 'normal',
-        }}
-      >
-        {value || '—'}
-      </div>
-    </div>
-  )
-}
-
-function KeywordsBlock({ keywords }: { keywords?: string[] }) {
-  return (
-    <div style={{ ...card, padding: 16 }}>
-      <div style={label}>Mots-clés</div>
-      {keywords && keywords.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-          {keywords.map((k) => (
-            <span key={k} style={chip}>
-              {k}
-            </span>
-          ))}
-        </div>
-      ) : (
-        <div style={{ fontSize: 15, color: 'var(--muted)', marginTop: 4 }}>—</div>
-      )}
-    </div>
-  )
-}
-
-const page: React.CSSProperties = { minHeight: '100vh', background: 'var(--ink)', color: 'var(--cream)', maxWidth: 880, margin: '0 auto', padding: '40px 24px 80px' }
-const bar: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16, marginBottom: 28 }
-const muted: React.CSSProperties = { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--muted)' }
-const card: React.CSSProperties = { background: 'var(--ink-2)', border: '1px solid var(--line-d)', borderRadius: 12 }
-const label: React.CSSProperties = { fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)' }
-const chip: React.CSSProperties = { fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--cream)', background: 'rgba(255,255,255,.04)', border: '1px solid var(--line-d)', borderRadius: 20, padding: '4px 12px' }
-const code: React.CSSProperties = { fontFamily: 'var(--mono)', fontSize: 13, background: 'rgba(255,255,255,.06)', borderRadius: 5, padding: '1px 6px' }
-const ghostBtn: React.CSSProperties = { background: 'transparent', color: 'var(--cream)', cursor: 'pointer' }

@@ -6,8 +6,8 @@ interface TcmContentSnapshot {
   items: { id: string; collection: string; ord: number; data: Record<string, unknown> }[]
 }
 
-// SEO injecté par Hubelly, figé au build et embarqué dans la page : pilote le H1
-// rendu (le H1 est du SEO, géré par Hubelly, pas par l'admin du site).
+// SEO administré dans TCM, figé au build et embarqué dans la page : pilote le H1
+// rendu. Seul le super admin TCM peut modifier la source persistée.
 interface TcmSeoSnapshot {
   h1?: string
 }

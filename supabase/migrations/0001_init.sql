@@ -6,8 +6,8 @@
 
 -- ----------------------------------------------------------------------------
 -- 1) Profils & rôles
---    Un profil par compte. admin (Théo) et super_admin (toi) ont des droits
---    STRICTEMENT identiques : le rôle n'est qu'une étiquette.
+--    Un profil par compte. admin édite le contenu courant ; super_admin garde
+--    les droits sensibles supplémentaires, notamment SEO/GEO.
 -- ----------------------------------------------------------------------------
 create table if not exists public.profiles (
   id           uuid primary key references auth.users (id) on delete cascade,
@@ -42,7 +42,7 @@ create index if not exists content_items_collection_ord_idx
 
 -- ----------------------------------------------------------------------------
 -- 4) Helper : l'utilisateur courant est-il éditeur ?
---    (admin ou super_admin — droits identiques). Utilisé par la RLS.
+--    (admin ou super_admin pour le contenu classique). Utilisé par la RLS.
 -- ----------------------------------------------------------------------------
 create or replace function public.is_editor()
 returns boolean
