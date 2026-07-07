@@ -123,6 +123,10 @@ export function InputBlock({
 }) {
   const fieldStyle: CSSProperties = {
     width: '100%',
+    maxWidth: '100%',
+    minWidth: 0,
+    boxSizing: 'border-box',
+    display: 'block',
     marginTop: 6,
     borderRadius: 10,
     border: '1px solid var(--line-d)',
@@ -131,14 +135,20 @@ export function InputBlock({
     padding: '10px 12px',
     font: mono ? '13px var(--mono)' : '15px var(--font)',
     lineHeight: 1.5,
+    overflowWrap: 'anywhere',
+    wordBreak: 'break-word',
+  }
+  const textAreaStyle: CSSProperties = {
+    ...fieldStyle,
+    resize: 'vertical',
+    overflow: 'auto',
   }
   const readOnlyDisplayStyle: CSSProperties = {
     ...fieldStyle,
     cursor: 'default',
     outline: 'none',
-    whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
-    overflow: multiline ? 'auto' : 'hidden',
-    textOverflow: multiline ? undefined : 'ellipsis',
+    whiteSpace: 'pre-wrap',
+    overflow: multiline ? 'auto' : 'visible',
     minHeight: multiline ? rows * 20 + 22 : undefined,
     maxHeight: multiline ? rows * 20 + 22 : undefined,
   }
@@ -153,9 +163,9 @@ export function InputBlock({
           {value || '—'}
         </div>
       ) : multiline ? (
-        <textarea value={value} onChange={onChange} readOnly={readOnly} rows={rows} style={fieldStyle} />
+        <textarea value={value} onChange={onChange} readOnly={readOnly} rows={rows} style={textAreaStyle} />
       ) : (
-        <input value={value} onChange={onChange} readOnly={readOnly} style={fieldStyle} />
+        <textarea value={value} onChange={onChange} readOnly={readOnly} rows={1} style={textAreaStyle} />
       )}
     </label>
   )
