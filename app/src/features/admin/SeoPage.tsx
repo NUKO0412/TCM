@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth'
@@ -48,6 +48,34 @@ function SeoPageContent({
   const update = (field: keyof SeoFormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((current) => ({ ...current, [field]: event.target.value }))
   }
+
+  useEffect(() => {
+    if (loading || error || form.geoAreaServed.trim()) return
+    if (role !== 'admin' && role !== 'super_admin') return
+    const token = session?.access_token
+    if (!token) return
+
+    let active = true
+    void (async () => {
+      try {
+        const res = await fetch('/api/seo-geo-sync', {
+          method: 'POST',
+          headers: { authorization: `Bearer ${token}` },
+        })
+        const data = (await res.json().catch(() => null)) as { ok?: boolean; areaServed?: unknown; error?: string } | null
+        if (!active || !res.ok || !data?.ok || !Array.isArray(data.areaServed)) return
+        const geoAreaServed = data.areaServed.filter((area): area is string => typeof area === 'string').join(', ')
+        setForm((current) => ({ ...current, geoAreaServed }))
+        setLastSavedAt(new Date().toISOString())
+      } catch {
+        // La carte reste lisible ; la prochaine modification des villes relancera la synchronisation.
+      }
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [error, form.geoAreaServed, loading, role, session?.access_token])
 
   const save = async () => {
     if (!isSuperAdmin || saving) return

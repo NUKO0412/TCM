@@ -63,10 +63,10 @@ const baseAuth = {
   updatePassword: vi.fn(),
 }
 
-function renderSeo(role: 'admin' | 'super_admin') {
+function renderSeo(role: 'admin' | 'super_admin', data: SeoData = seoData) {
   mockAuth.mockReturnValue({ ...baseAuth, role })
   mockUseSeo.mockReturnValue({
-    row: { data: seoData, updated_at: '2026-07-07T10:00:00.000Z' },
+    row: { data, updated_at: '2026-07-07T10:00:00.000Z' },
     loading: false,
     error: null,
   })
@@ -184,6 +184,23 @@ describe('SeoPage', () => {
     expect(screen.getByText('Services GEO principaux')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Aide' })).toHaveLength(18)
     expect(screen.getByRole('button', { name: 'Sauvegarder la SEO' })).toBeDisabled()
+  })
+
+  it('remplit Zones GEO ciblées depuis les villes si la valeur SEO est vide', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, areaServed: ['Lorient', 'Hennebont', 'Ploemeur'] }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    )
+
+    renderSeo('admin', { ...seoData, geo: { ...seoData.geo, areaServed: [] } })
+
+    await waitFor(() => expect(screen.getByText('Lorient, Hennebont, Ploemeur')).toBeInTheDocument())
+    expect(fetchMock).toHaveBeenCalledWith('/api/seo-geo-sync', {
+      method: 'POST',
+      headers: { authorization: 'Bearer token' },
+    })
   })
 
   it('sauvegarde uniquement les champs autorisés côté super admin', async () => {
