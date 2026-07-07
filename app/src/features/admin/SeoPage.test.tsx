@@ -76,6 +76,10 @@ function controlByValue(value: string | RegExp) {
   return screen.getByDisplayValue(value) as HTMLInputElement | HTMLTextAreaElement
 }
 
+function readonlyValue(value: string | RegExp) {
+  return screen.getByText(value)
+}
+
 const editableValues = [
   'Title test',
   'H1 test',
@@ -149,18 +153,20 @@ describe('SeoPage', () => {
     }
 
     for (const value of lockedValues) {
-      expect(controlByValue(value).readOnly).toBe(true)
+      expect(screen.queryByDisplayValue(value)).toBeNull()
+      expect(readonlyValue(value)).toHaveStyle({ cursor: 'default', outline: 'none' })
     }
-    expect(controlByValue(/"@type": "GeneralContractor"/).readOnly).toBe(true)
+    expect(readonlyValue(/"@type": "GeneralContractor"/)).toHaveStyle({ cursor: 'default', overflow: 'auto' })
   })
 
   it('garde un admin normal en lecture seule avec la même structure visible', () => {
     renderSeo('admin')
 
     for (const value of [...editableValues, ...lockedValues]) {
-      expect(controlByValue(value).readOnly).toBe(true)
+      expect(screen.queryByDisplayValue(value)).toBeNull()
+      expect(readonlyValue(value)).toHaveStyle({ cursor: 'default', outline: 'none' })
     }
-    expect(controlByValue(/"@type": "GeneralContractor"/).readOnly).toBe(true)
+    expect(readonlyValue(/"@type": "GeneralContractor"/)).toHaveStyle({ cursor: 'default', overflow: 'auto' })
     expect(screen.getByText('Zones GEO ciblées')).toBeInTheDocument()
     expect(screen.getByText('Services GEO principaux')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Aide' })).toHaveLength(18)

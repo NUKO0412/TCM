@@ -105,13 +105,27 @@ export function InputBlock({
     font: mono ? '13px var(--mono)' : '15px var(--font)',
     lineHeight: 1.5,
   }
+  const readOnlyDisplayStyle: CSSProperties = {
+    ...fieldStyle,
+    cursor: 'default',
+    outline: 'none',
+    whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+    overflow: multiline ? 'auto' : 'hidden',
+    textOverflow: multiline ? undefined : 'ellipsis',
+    minHeight: multiline ? rows * 20 + 22 : undefined,
+    maxHeight: multiline ? rows * 20 + 22 : undefined,
+  }
   return (
     <label style={{ ...card, display: 'block', padding: 16 }}>
       <span style={labelRow}>
         <span style={label}>{l}</span>
         <HelpTip text={help} />
       </span>
-      {multiline ? (
+      {readOnly ? (
+        <div data-readonly-field={l} style={readOnlyDisplayStyle}>
+          {value || '—'}
+        </div>
+      ) : multiline ? (
         <textarea value={value} onChange={onChange} readOnly={readOnly} rows={rows} style={fieldStyle} />
       ) : (
         <input value={value} onChange={onChange} readOnly={readOnly} style={fieldStyle} />
