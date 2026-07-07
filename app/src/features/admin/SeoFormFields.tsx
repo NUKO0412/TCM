@@ -40,6 +40,7 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
     data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
   const queries = data?.queries ?? data?.topQueries
   const period = data?.period ? `${data.period.startDate} → ${data.period.endDate}` : undefined
+  const ctr = data?.ctr === undefined ? undefined : `${(data.ctr * 100).toFixed(2)} %`
   const fetchedAt = data?.fetchedAt
     ? new Date(data.fetchedAt).toLocaleString('fr-FR', {
         day: '2-digit',
@@ -59,6 +60,7 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
         <FieldLine label="Statut" value={indexed} />
         <FieldLine label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
         <FieldLine label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} />
+        <FieldLine label="CTR" value={ctr} />
         <FieldLine label="Position moyenne" value={data?.position == null ? undefined : String(data.position)} />
         <FieldLine label="Dernière récupération" value={fetchedAt} />
         <FieldLine label="Période analysée" value={period} />
@@ -69,6 +71,18 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
               {queries.map((q) => (
                 <div key={q.query} style={{ fontSize: 13, color: '#E5DCC9', fontFamily: 'var(--mono)' }}>
                   {q.query} · {q.clicks ?? 0} clic(s) · {q.impressions ?? 0} impression(s)
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {data?.pages?.length ? (
+          <div>
+            <div style={label}>Top pages</div>
+            <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
+              {data.pages.map((p) => (
+                <div key={p.page} style={{ fontSize: 13, color: '#E5DCC9', fontFamily: 'var(--mono)' }}>
+                  {p.page} · {p.clicks ?? 0} clic(s) · {p.impressions ?? 0} impression(s)
                 </div>
               ))}
             </div>
