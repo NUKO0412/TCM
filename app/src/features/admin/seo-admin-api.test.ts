@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import handler from './seo-admin'
+import handler from '../../../api/seo-admin'
 
 const existingSeo = {
   title: 'Old title',
