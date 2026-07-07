@@ -95,7 +95,6 @@ const editableValues = [
   'OG description test',
   'Twitter title test',
   'Twitter description test',
-  'Lorient, Lanester',
   'menuiserie sur mesure, agencement intérieur',
 ]
 
@@ -104,6 +103,7 @@ const lockedValues = [
   'https://www.tcmagencement.fr/',
   'https://www.tcmagencement.fr/og.png',
   'https://www.tcmagencement.fr/twitter.png',
+  'Lorient, Lanester',
 ]
 
 describe('SeoPage', () => {
@@ -158,7 +158,7 @@ describe('SeoPage', () => {
     expect(screen.getByRole('button', { name: 'Sauvegarder la SEO' })).toBeEnabled()
   })
 
-  it('laisse le super admin modifier uniquement les champs rédactionnels SEO/GEO', () => {
+  it('laisse le super admin modifier uniquement les champs rédactionnels SEO/GEO non synchronisés', () => {
     renderSeo('super_admin')
 
     for (const value of editableValues) {
@@ -204,7 +204,6 @@ describe('SeoPage', () => {
       og: { title: 'OG title test', description: 'OG description test' },
       twitter: { title: 'Twitter title test', description: 'Twitter description test' },
       geo: {
-        areaServed: ['Lorient', 'Lanester'],
         services: ['menuiserie sur mesure', 'agencement intérieur'],
       },
     })

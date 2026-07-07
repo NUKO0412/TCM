@@ -19,7 +19,7 @@ const SEO_PAGE = '/'
 const ROOT_FIELDS = new Set(['page', 'title', 'description', 'h1', 'keywords', 'og', 'twitter', 'geo'])
 const OG_FIELDS = new Set(['title', 'description'])
 const TWITTER_FIELDS = new Set(['title', 'description'])
-const GEO_FIELDS = new Set(['areaServed', 'services'])
+const GEO_FIELDS = new Set(['services'])
 
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)

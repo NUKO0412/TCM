@@ -26,6 +26,13 @@ function setPath(target: unknown, path: string, value: unknown): unknown {
   return { ...((target as Record<string, unknown>) ?? {}), [head]: nextChild }
 }
 
+async function syncSeoGeoAreas(shouldSync: boolean) {
+  if (!shouldSync) return
+  const { syncSeoGeoAreasFromVilles } = await import('./contentApi')
+  const result = await syncSeoGeoAreasFromVilles()
+  if (!result.ok) console.error('syncSeoGeoAreasFromVilles', result.error)
+}
+
 export function ContentProvider({ children }: { children: ReactNode }) {
   // Photo des données figée au build (index.html) : permet d'afficher le contenu
   // dès le premier rendu, identique au HTML pré-rendu (hydratation sans flash).
@@ -122,6 +129,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       const { persistItem } = await import('./contentApi')
       const { error } = await persistItem(id, nextData)
       if (error) console.error('updateItem', error.message)
+      else await syncSeoGeoAreas(cur.collection === 'villes')
     },
     [commitItems],
   )
@@ -137,16 +145,19 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         return
       }
       commitItems([...itemsRef.current, inserted as ItemRow])
+      await syncSeoGeoAreas(collection === 'villes')
     },
     [commitItems],
   )
 
   const removeItem = useCallback(
     async (id: string) => {
+      const cur = itemsRef.current.find((r) => r.id === id)
       commitItems(itemsRef.current.filter((r) => r.id !== id))
       const { deleteItem } = await import('./contentApi')
       const { error } = await deleteItem(id)
       if (error) console.error('removeItem', error.message)
+      else await syncSeoGeoAreas(cur?.collection === 'villes')
     },
     [commitItems],
   )
@@ -164,6 +175,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       const results = await persistItemOrder(orderedIds)
       const failed = results.find((r) => r.error)
       if (failed?.error) console.error('reorderItems', failed.error.message)
+      else await syncSeoGeoAreas(collection === 'villes')
     },
     [commitItems],
   )

@@ -55,3 +55,22 @@ export async function persistItemOrder(orderedIds: string[]) {
     ),
   )
 }
+
+export async function syncSeoGeoAreasFromVilles(): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await loadSupabase()
+  const { data } = await supabase.auth.getSession()
+  const token = data.session?.access_token
+  if (!token) return { ok: false, error: 'missing_token' }
+
+  try {
+    const res = await fetch('/api/seo-geo-sync', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+    })
+    const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null
+    if (!res.ok || !body?.ok) return { ok: false, error: body?.error ?? `HTTP ${res.status}` }
+    return { ok: true }
+  } catch {
+    return { ok: false, error: 'request_failed' }
+  }
+}

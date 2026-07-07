@@ -73,7 +73,6 @@ function SeoPageContent({
             description: form.twitterDescription,
           },
           geo: {
-            areaServed: splitSeoList(form.geoAreaServed),
             services: splitSeoList(form.geoServices),
           },
         }),
@@ -210,7 +209,7 @@ function SeoPageContent({
               help={HELP.geoAreaServed}
               value={form.geoAreaServed}
               onChange={update('geoAreaServed')}
-              readOnly={!isSuperAdmin}
+              readOnly
             />
             <InputBlock
               label="Services GEO principaux"
@@ -280,7 +279,7 @@ const HELP = {
   structuredData:
     "Données structurées lues par Google, Bing et certains moteurs IA pour mieux comprendre l’entreprise : nom, métier, adresse, zone d’intervention, réseaux sociaux, type d’activité, services, FAQ, etc. Ce bloc est très sensible : une virgule, une accolade ou une faute de syntaxe peut casser les données structurées. Il reste visible pour contrôle, mais il ne se modifie pas directement ici.",
   geoAreaServed:
-    "Champ lié à la stratégie SEO/GEO du site. Il sert à indiquer les zones, communes ou secteurs que TCM veut associer à sa visibilité locale. Ces informations aident à garder une cohérence entre le site, les contenus, les moteurs de recherche et les moteurs IA. À remplir avec les zones réellement importantes pour l’activité de TCM.",
+    "Champ lié à la stratégie SEO/GEO du site. Il reprend automatiquement les villes et zones indiquées dans la section Zone d’intervention du site vitrine. Quand un administrateur ajoute, retire ou corrige une ville sur le site, cette liste se synchronise pour garder la SEO locale cohérente avec les zones réellement affichées.",
   geoServices:
     "Champ lié à la stratégie SEO/GEO du site. Il sert à indiquer les services principaux que TCM veut associer à sa visibilité locale. Par exemple : menuiserie sur mesure, agencement intérieur, cuisine, dressing, parquet, portes, escaliers, terrasse bois. Ces informations aident les moteurs à relier l’entreprise aux bons services et aux bonnes recherches locales.",
   searchConsole:

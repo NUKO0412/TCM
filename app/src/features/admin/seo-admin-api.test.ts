@@ -37,7 +37,6 @@ const allowedPayload = {
   og: { title: 'New OG title', description: 'New OG description' },
   twitter: { title: 'New Twitter title', description: 'New Twitter description' },
   geo: {
-    areaServed: ['Lorient', 'Lanester'],
     services: ['Agencement intérieur', 'Cuisine'],
   },
 }
@@ -115,7 +114,7 @@ describe('seo-admin API', () => {
     expect(upserts).toHaveLength(0)
   })
 
-  it('autorise un super_admin à écrire uniquement les champs rédactionnels SEO/GEO', async () => {
+  it('autorise un super_admin à écrire uniquement les champs rédactionnels SEO/GEO non synchronisés', async () => {
     const response = await handler(seoRequest(allowedPayload))
 
     expect(response.status).toBe(200)
@@ -132,7 +131,7 @@ describe('seo-admin API', () => {
       og: { title: 'New OG title', description: 'New OG description' },
       twitter: { title: 'New Twitter title', description: 'New Twitter description' },
       geo: {
-        areaServed: ['Lorient', 'Lanester'],
+        areaServed: ['Lorient'],
         services: ['Agencement intérieur', 'Cuisine'],
       },
     })
@@ -151,6 +150,7 @@ describe('seo-admin API', () => {
         structuredData: { '@type': 'Thing' },
         og: { ...allowedPayload.og, image: 'https://example.com/og.png' },
         twitter: { ...allowedPayload.twitter, image: 'https://example.com/twitter.png' },
+        geo: { ...allowedPayload.geo, areaServed: ['Vannes'] },
         unknownField: 'nope',
       }),
     )
@@ -159,7 +159,15 @@ describe('seo-admin API', () => {
     const body = await bodyOf(response)
     expect(body.error).toBe('forbidden_seo_fields')
     expect(body.fields).toEqual(
-      expect.arrayContaining(['unknownField', 'page', 'canonical', 'structuredData', 'og.image', 'twitter.image']),
+      expect.arrayContaining([
+        'unknownField',
+        'page',
+        'canonical',
+        'structuredData',
+        'og.image',
+        'twitter.image',
+        'geo.areaServed',
+      ]),
     )
     expect(upserts).toHaveLength(0)
     expect(rebuildCalls).toBe(0)
