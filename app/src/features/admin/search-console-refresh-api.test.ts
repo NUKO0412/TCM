@@ -154,6 +154,7 @@ describe('search-console-refresh API', () => {
       impressions: 77,
       ctr: 0.052,
       position: 16.7,
+      period: { label: '28 derniers jours', days: 28 },
       status: 'Submitted and indexed',
       indexed: true,
     })

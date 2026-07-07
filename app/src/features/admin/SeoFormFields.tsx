@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { ChangeEvent, CSSProperties } from 'react'
 import type { SeoData } from '../../config/business'
 import { card, label } from './seoPageStyles'
@@ -39,8 +39,11 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
   const indexed =
     data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
   const queries = data?.queries ?? data?.topQueries
-  const period = data?.period ? `${data.period.startDate} → ${data.period.endDate}` : undefined
+  const period = data?.period
+    ? `${data.period.label ? `${data.period.label} · ` : ''}${data.period.startDate} → ${data.period.endDate}`
+    : undefined
   const ctr = data?.ctr === undefined ? undefined : `${(data.ctr * 100).toFixed(2)} %`
+  const position = data?.position == null ? undefined : data.position.toFixed(1)
   const fetchedAt = data?.fetchedAt
     ? new Date(data.fetchedAt).toLocaleString('fr-FR', {
         day: '2-digit',
@@ -61,7 +64,7 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
         <FieldLine label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
         <FieldLine label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} />
         <FieldLine label="CTR" value={ctr} />
-        <FieldLine label="Position moyenne" value={data?.position == null ? undefined : String(data.position)} />
+        <FieldLine label="Position moyenne" value={position} />
         <FieldLine label="Dernière récupération" value={fetchedAt} />
         <FieldLine label="Période analysée" value={period} />
         {queries?.length ? (
@@ -102,6 +105,29 @@ function FieldLine({ label: l, value }: { label: string; value?: string | null }
   )
 }
 
+function AutoTextarea({
+  value,
+  onChange,
+  rows,
+  style,
+}: {
+  value: string
+  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
+  rows: number
+  style: CSSProperties
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  useLayoutEffect(() => {
+    const field = ref.current
+    if (!field) return
+    field.style.height = 'auto'
+    field.style.height = `${field.scrollHeight}px`
+  }, [value])
+
+  return <textarea ref={ref} value={value} onChange={onChange} rows={rows} style={style} />
+}
+
 export function InputBlock({
   label: l,
   help,
@@ -121,6 +147,7 @@ export function InputBlock({
   mono?: boolean
   rows?: number
 }) {
+  const isScrollableReadOnly = Boolean(mono && multiline && rows >= 10)
   const fieldStyle: CSSProperties = {
     width: '100%',
     maxWidth: '100%',
@@ -140,17 +167,17 @@ export function InputBlock({
   }
   const textAreaStyle: CSSProperties = {
     ...fieldStyle,
-    resize: 'vertical',
-    overflow: 'auto',
+    resize: 'none',
+    overflow: 'hidden',
   }
   const readOnlyDisplayStyle: CSSProperties = {
     ...fieldStyle,
     cursor: 'default',
     outline: 'none',
     whiteSpace: 'pre-wrap',
-    overflow: multiline ? 'auto' : 'visible',
-    minHeight: multiline ? rows * 20 + 22 : undefined,
-    maxHeight: multiline ? rows * 20 + 22 : undefined,
+    overflow: isScrollableReadOnly ? 'auto' : 'visible',
+    minHeight: isScrollableReadOnly ? rows * 20 + 22 : undefined,
+    maxHeight: isScrollableReadOnly ? rows * 20 + 22 : undefined,
   }
   return (
     <label style={{ ...card, display: 'block', padding: 16 }}>
@@ -163,9 +190,9 @@ export function InputBlock({
           {value || '—'}
         </div>
       ) : multiline ? (
-        <textarea value={value} onChange={onChange} readOnly={readOnly} rows={rows} style={textAreaStyle} />
+        <AutoTextarea value={value} onChange={onChange} rows={rows} style={textAreaStyle} />
       ) : (
-        <textarea value={value} onChange={onChange} readOnly={readOnly} rows={1} style={textAreaStyle} />
+        <AutoTextarea value={value} onChange={onChange} rows={1} style={textAreaStyle} />
       )}
     </label>
   )

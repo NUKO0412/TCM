@@ -81,6 +81,8 @@ export interface SeoData {
     period?: {
       startDate: string
       endDate: string
+      label?: string
+      days?: number
     }
   }
 }

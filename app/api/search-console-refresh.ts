@@ -6,6 +6,9 @@ const SEO_PAGE = '/'
 const DEFAULT_SITE_URL = 'https://www.tcmagencement.fr/'
 const TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly'
+const GSC_PERIOD_DAYS = 28
+const GSC_DATA_DELAY_DAYS = 3
+const GSC_PERIOD_LABEL = '28 derniers jours'
 
 type SearchAnalyticsRow = {
   keys?: string[]
@@ -27,7 +30,7 @@ type SearchConsoleData = {
   pages: Array<{ page: string; clicks: number; impressions: number; ctr?: number; position: number | null }>
   source: 'google_search_console'
   fetchedAt: string
-  period: { startDate: string; endDate: string }
+  period: { startDate: string; endDate: string; label: string; days: number }
 }
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
@@ -104,10 +107,10 @@ function isoDate(daysAgo: number): string {
 }
 
 function defaultPeriod() {
-  const endDate = isoDate(3)
+  const endDate = isoDate(GSC_DATA_DELAY_DAYS)
   const start = new Date(`${endDate}T00:00:00.000Z`)
-  start.setUTCDate(start.getUTCDate() - 27)
-  return { startDate: start.toISOString().slice(0, 10), endDate }
+  start.setUTCDate(start.getUTCDate() - (GSC_PERIOD_DAYS - 1))
+  return { startDate: start.toISOString().slice(0, 10), endDate, label: GSC_PERIOD_LABEL, days: GSC_PERIOD_DAYS }
 }
 
 async function querySearchAnalytics(

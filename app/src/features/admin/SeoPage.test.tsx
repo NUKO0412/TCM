@@ -43,13 +43,13 @@ const seoData: SeoData = {
     clicks: 12,
     impressions: 340,
     ctr: 0.035,
-    position: 4.2,
+    position: 4.237837837837838,
     queries: [{ query: 'tcm agencement', clicks: 3, impressions: 50, ctr: 0.06, position: 2.5 }],
     topQueries: [{ query: 'tcm agencement', clicks: 3, impressions: 50, position: 2.5 }],
     pages: [{ page: 'https://www.tcmagencement.fr/', clicks: 3, impressions: 50, ctr: 0.06, position: 2.5 }],
     source: 'google_search_console',
     fetchedAt: '2026-07-07T09:15:00.000Z',
-    period: { startDate: '2026-06-07', endDate: '2026-07-04' },
+    period: { startDate: '2026-06-07', endDate: '2026-07-04', label: '28 derniers jours', days: 28 },
   },
 }
 
@@ -152,7 +152,8 @@ describe('SeoPage', () => {
     expect(screen.getByText('3.50 %')).toBeInTheDocument()
     expect(screen.getByText('Top pages')).toBeInTheDocument()
     expect(screen.getByText('07/07/2026 11:15')).toBeInTheDocument()
-    expect(screen.getByText('2026-06-07 → 2026-07-04')).toBeInTheDocument()
+    expect(screen.getByText('4.2')).toBeInTheDocument()
+    expect(screen.getByText('28 derniers jours · 2026-06-07 → 2026-07-04')).toBeInTheDocument()
     expect(screen.queryByText('Intégration · SEO')).toBeNull()
     expect(screen.queryByText('/api/seo-ingest')).toBeNull()
     expect(screen.getByRole('button', { name: 'Sauvegarder la SEO' })).toBeEnabled()
