@@ -225,7 +225,7 @@ function hasValidSecret(request: Request): boolean {
 }
 
 export default async function handler(request: Request): Promise<Response> {
-  if (request.method !== 'POST') return reply(405, { error: 'method_not_allowed' })
+  if (request.method !== 'GET' && request.method !== 'POST') return reply(405, { error: 'method_not_allowed' })
   if (!hasValidSecret(request)) return reply(401, { error: 'unauthorized' })
 
   const supabaseEnv = getSupabaseServerEnv()

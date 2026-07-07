@@ -40,9 +40,9 @@ async function makePrivateKeyPem() {
   return `-----BEGIN PRIVATE KEY-----\n${base64}\n-----END PRIVATE KEY-----`
 }
 
-function refreshRequest(secret?: string) {
+function refreshRequest(secret?: string, method = 'POST') {
   return new Request('https://www.tcmagencement.fr/api/search-console-refresh', {
-    method: 'POST',
+    method,
     headers: secret ? { authorization: `Bearer ${secret}` } : undefined,
   })
 }
@@ -110,6 +110,23 @@ describe('search-console-refresh API', () => {
     expect(response.status).toBe(401)
     expect(await bodyOf(response)).toMatchObject({ error: 'unauthorized' })
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('refuse un secret invalide sans appeler Google ni Supabase', async () => {
+    const response = await handler(refreshRequest('bad-secret'))
+
+    expect(response.status).toBe(401)
+    expect(await bodyOf(response)).toMatchObject({ error: 'unauthorized' })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('accepte GET avec le secret Vercel Cron', async () => {
+    process.env.CRON_SECRET = 'cron-secret'
+
+    const response = await handler(refreshRequest('cron-secret', 'GET'))
+
+    expect(response.status).toBe(200)
+    expect(patches).toHaveLength(1)
   })
 
   it('récupère Google Search Console et ne remplace que searchConsole en base', async () => {
