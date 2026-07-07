@@ -150,6 +150,15 @@ describe('search-console-refresh API', () => {
     )
   })
 
+  it('accepte aussi le secret Vercel Cron si configuré séparément', async () => {
+    process.env.CRON_SECRET = 'cron-secret'
+
+    const response = await handler(refreshRequest('cron-secret'))
+
+    expect(response.status).toBe(200)
+    expect(patches).toHaveLength(1)
+  })
+
   it('gère une erreur Google sans écrire dans Supabase', async () => {
     googleShouldFail = true
 

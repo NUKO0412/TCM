@@ -215,11 +215,13 @@ async function storeSearchConsole(supabaseUrl: string, serviceKey: string, searc
 }
 
 function hasValidSecret(request: Request): boolean {
-  const expected = process.env.GSC_REFRESH_SECRET ?? process.env.CRON_SECRET
-  if (!expected) return false
+  const expected = [process.env.GSC_REFRESH_SECRET, process.env.CRON_SECRET].filter(
+    (secret): secret is string => typeof secret === 'string' && secret.length > 0,
+  )
+  if (!expected.length) return false
   const auth = request.headers.get('authorization') ?? ''
   const headerSecret = request.headers.get('x-refresh-secret') ?? ''
-  return auth === `Bearer ${expected}` || headerSecret === expected
+  return expected.some((secret) => auth === `Bearer ${secret}` || headerSecret === secret)
 }
 
 export default async function handler(request: Request): Promise<Response> {
