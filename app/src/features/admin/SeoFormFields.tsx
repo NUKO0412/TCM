@@ -39,11 +39,8 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
   const indexed =
     data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
   const queries = data?.queries ?? data?.topQueries
-  const period = data?.period
-    ? `${data.period.label ? `${data.period.label} · ` : ''}${data.period.startDate} → ${data.period.endDate}`
-    : undefined
-  const ctr = data?.ctr === undefined ? undefined : `${(data.ctr * 100).toFixed(2)} %`
-  const position = data?.position == null ? undefined : data.position.toFixed(1)
+  const ctr = data?.ctr === undefined ? undefined : formatNumber(data.ctr * 100, 1)
+  const position = data?.position == null ? undefined : formatNumber(data.position, 1)
   const fetchedAt = data?.fetchedAt
     ? new Date(data.fetchedAt).toLocaleString('fr-FR', {
         day: '2-digit',
@@ -61,12 +58,15 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
       </div>
       <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
         <FieldLine label="Statut" value={indexed} />
-        <FieldLine label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
-        <FieldLine label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} />
-        <FieldLine label="CTR" value={ctr} />
+        <div style={label}>Performance sur les 28 derniers jours</div>
+        <FieldLine label="Nombre total de clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
+        <FieldLine
+          label="Nombre total d’impressions"
+          value={data?.impressions === undefined ? undefined : String(data.impressions)}
+        />
+        <FieldLine label="CTR moyen" value={ctr ? `${ctr} %` : undefined} />
         <FieldLine label="Position moyenne" value={position} />
         <FieldLine label="Dernière récupération" value={fetchedAt} />
-        <FieldLine label="Période analysée" value={period} />
         {queries?.length ? (
           <div>
             <div style={label}>Top requêtes</div>
@@ -94,6 +94,10 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
       </div>
     </div>
   )
+}
+
+function formatNumber(value: number, maximumFractionDigits: number) {
+  return new Intl.NumberFormat('fr-FR', { maximumFractionDigits }).format(value)
 }
 
 function FieldLine({ label: l, value }: { label: string; value?: string | null }) {

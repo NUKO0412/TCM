@@ -7,7 +7,7 @@ const DEFAULT_SITE_URL = 'https://www.tcmagencement.fr/'
 const TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly'
 const GSC_PERIOD_DAYS = 28
-const GSC_DATA_DELAY_DAYS = 3
+const GSC_DATA_DELAY_DAYS = 2
 const GSC_PERIOD_LABEL = '28 derniers jours'
 
 type SearchAnalyticsRow = {
