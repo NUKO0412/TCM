@@ -15,6 +15,12 @@ type IncomingSeo = {
   geo?: unknown
 }
 
+const SEO_PAGE = '/'
+const ROOT_FIELDS = new Set(['page', 'title', 'description', 'h1', 'keywords', 'og', 'twitter', 'geo'])
+const OG_FIELDS = new Set(['title', 'description'])
+const TWITTER_FIELDS = new Set(['title', 'description'])
+const GEO_FIELDS = new Set(['areaServed', 'services'])
+
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)
 
@@ -30,6 +36,39 @@ function cleanKeywords(value: unknown): string[] | undefined {
 
 function mergeObject(existing: unknown, incoming: Record<string, unknown>): Record<string, unknown> {
   return { ...(isPlainObject(existing) ? existing : {}), ...incoming }
+}
+
+function forbiddenFields(body: IncomingSeo): string[] {
+  const forbidden = new Set<string>()
+  for (const key of Object.keys(body)) {
+    if (!ROOT_FIELDS.has(key)) forbidden.add(key)
+  }
+
+  if (body.page !== undefined && textOrUndefined(body.page) !== SEO_PAGE) forbidden.add('page')
+  if (body.canonical !== undefined) forbidden.add('canonical')
+  if (body.structuredData !== undefined) forbidden.add('structuredData')
+
+  if (isPlainObject(body.og)) {
+    for (const key of Object.keys(body.og)) {
+      if (!OG_FIELDS.has(key)) forbidden.add(`og.${key}`)
+    }
+  }
+  if (isPlainObject(body.twitter)) {
+    for (const key of Object.keys(body.twitter)) {
+      if (!TWITTER_FIELDS.has(key)) forbidden.add(`twitter.${key}`)
+    }
+  }
+  if (isPlainObject(body.geo)) {
+    for (const key of Object.keys(body.geo)) {
+      if (!GEO_FIELDS.has(key)) forbidden.add(`geo.${key}`)
+    }
+  }
+
+  return [...forbidden]
+}
+
+function pickFields(source: Record<string, unknown>, allowed: Set<string>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(source).filter(([key]) => allowed.has(key)))
 }
 
 async function getUserId(supabaseUrl: string, anonKey: string, token: string): Promise<string | null> {
@@ -82,7 +121,9 @@ export default async function handler(request: Request): Promise<Response> {
     return reply(400, { error: 'invalid_json' })
   }
 
-  const page = textOrUndefined(body.page) ?? '/'
+  const forbidden = forbiddenFields(body)
+  if (forbidden.length) return reply(400, { error: 'forbidden_seo_fields', fields: forbidden })
+
   const title = textOrUndefined(body.title)
   const description = textOrUndefined(body.description)
   const h1 = textOrUndefined(body.h1)
@@ -92,12 +133,9 @@ export default async function handler(request: Request): Promise<Response> {
 
   if (body.og !== undefined && !isPlainObject(body.og)) return reply(400, { error: 'og_must_be_object' })
   if (body.twitter !== undefined && !isPlainObject(body.twitter)) return reply(400, { error: 'twitter_must_be_object' })
-  if (body.structuredData !== undefined && !isPlainObject(body.structuredData)) {
-    return reply(400, { error: 'structuredData_must_be_object' })
-  }
   if (body.geo !== undefined && !isPlainObject(body.geo)) return reply(400, { error: 'geo_must_be_object' })
 
-  const existing = await readExistingSeo(supabaseEnv.supabaseUrl, supabaseEnv.serviceKey, page)
+  const existing = await readExistingSeo(supabaseEnv.supabaseUrl, supabaseEnv.serviceKey, SEO_PAGE)
   const data: Record<string, unknown> = {
     ...existing,
     title,
@@ -105,14 +143,11 @@ export default async function handler(request: Request): Promise<Response> {
     h1,
   }
 
-  const canonical = textOrUndefined(body.canonical)
-  if (canonical) data.canonical = canonical
   const keywords = cleanKeywords(body.keywords)
   if (keywords) data.keywords = keywords
-  if (isPlainObject(body.og)) data.og = mergeObject(existing.og, body.og)
-  if (isPlainObject(body.twitter)) data.twitter = mergeObject(existing.twitter, body.twitter)
-  if (isPlainObject(body.structuredData)) data.structuredData = body.structuredData
-  if (isPlainObject(body.geo)) data.geo = body.geo
+  if (isPlainObject(body.og)) data.og = mergeObject(existing.og, pickFields(body.og, OG_FIELDS))
+  if (isPlainObject(body.twitter)) data.twitter = mergeObject(existing.twitter, pickFields(body.twitter, TWITTER_FIELDS))
+  if (isPlainObject(body.geo)) data.geo = mergeObject(existing.geo, pickFields(body.geo, GEO_FIELDS))
 
   const upsert = await fetch(`${supabaseEnv.supabaseUrl}/rest/v1/seo?on_conflict=page`, {
     method: 'POST',
@@ -122,7 +157,7 @@ export default async function handler(request: Request): Promise<Response> {
       'content-type': 'application/json',
       prefer: 'resolution=merge-duplicates,return=minimal',
     },
-    body: JSON.stringify({ page, data, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ page: SEO_PAGE, data, updated_at: new Date().toISOString() }),
   })
 
   if (!upsert.ok) {
@@ -136,5 +171,5 @@ export default async function handler(request: Request): Promise<Response> {
     rebuild = res?.ok ? 'triggered' : 'failed'
   }
 
-  return reply(200, { ok: true, page, rebuild })
+  return reply(200, { ok: true, page: SEO_PAGE, rebuild })
 }
