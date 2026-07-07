@@ -38,6 +38,17 @@ export function HelpTip({ text }: { text: string }) {
 export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData['searchConsole']>; help: string }) {
   const indexed =
     data?.indexed === true ? 'Indexée' : data?.indexed === false ? 'Non indexée / en attente' : data?.status
+  const queries = data?.queries ?? data?.topQueries
+  const period = data?.period ? `${data.period.startDate} → ${data.period.endDate}` : undefined
+  const fetchedAt = data?.fetchedAt
+    ? new Date(data.fetchedAt).toLocaleString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : undefined
   return (
     <div style={{ ...card, padding: 16, marginTop: 18 }}>
       <div style={labelRow}>
@@ -49,11 +60,13 @@ export function SearchConsoleBlock({ data, help }: { data?: NonNullable<SeoData[
         <FieldLine label="Clics" value={data?.clicks === undefined ? undefined : String(data.clicks)} />
         <FieldLine label="Impressions" value={data?.impressions === undefined ? undefined : String(data.impressions)} />
         <FieldLine label="Position moyenne" value={data?.position == null ? undefined : String(data.position)} />
-        {data?.topQueries?.length ? (
+        <FieldLine label="Dernière récupération" value={fetchedAt} />
+        <FieldLine label="Période analysée" value={period} />
+        {queries?.length ? (
           <div>
             <div style={label}>Top requêtes</div>
             <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
-              {data.topQueries.map((q) => (
+              {queries.map((q) => (
                 <div key={q.query} style={{ fontSize: 13, color: '#E5DCC9', fontFamily: 'var(--mono)' }}>
                   {q.query} · {q.clicks ?? 0} clic(s) · {q.impressions ?? 0} impression(s)
                 </div>

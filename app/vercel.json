@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/search-console-refresh",
+      "schedule": "0 6 */2 * *"
+    }
+  ],
   "redirects": [
     {
       "source": "/(.*)",

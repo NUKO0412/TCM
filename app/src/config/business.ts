@@ -71,8 +71,17 @@ export interface SeoData {
     status?: string
     clicks?: number
     impressions?: number
+    ctr?: number
     position?: number | null
+    queries?: Array<{ query: string; clicks?: number; impressions?: number; ctr?: number; position?: number | null }>
     topQueries?: Array<{ query: string; clicks?: number; impressions?: number; position?: number | null }>
+    pages?: Array<{ page: string; clicks?: number; impressions?: number; ctr?: number; position?: number | null }>
+    source?: string
+    fetchedAt?: string
+    period?: {
+      startDate: string
+      endDate: string
+    }
   }
 }
 
