@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && tsx scripts/prerender-home.ts && tsx scripts/seo-prerender.ts",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && tsx scripts/prerender-home.ts && tsx scripts/seo-prerender.ts && tsx scripts/prerender-legal.ts",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview",

@@ -91,6 +91,25 @@ function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+function safeJsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c')
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function buildStructuredData(source: SeoData, description: string, image: string) {
+  const base: Record<string, unknown> = isRecord(source.structuredData) ? source.structuredData : buildJsonLd()
+  const areas = source.geo?.areaServed?.filter(Boolean)
+  return {
+    ...base,
+    description: typeof base.description === 'string' ? base.description : description,
+    image: typeof base.image === 'string' ? base.image : image,
+    ...(areas?.length ? { areaServed: areas } : {}),
+  }
+}
+
 // Contenu du <head> livré aux robots. Source principale : public.seo interne à
 // TCM. Source secondaire : snapshot versionné validé.
 export function buildHead(seo: SeoData | null): { title: string; tags: string } {
@@ -106,13 +125,13 @@ export function buildHead(seo: SeoData | null): { title: string; tags: string } 
   const title = source.title ?? TITLE_FALLBACK
   const description = source.description ?? DESCRIPTION_FALLBACK
   const canonical = source.canonical ?? SEO_CANONICAL
-  const jsonLd = source.structuredData ?? buildJsonLd()
   const ogTitle = source.og?.title ?? title
   const ogDescription = source.og?.description ?? description
   const ogImage = source.og?.image ?? DEFAULT_OG_IMAGE
   const twitterTitle = source.twitter?.title ?? ogTitle
   const twitterDescription = source.twitter?.description ?? ogDescription
   const twitterImage = source.twitter?.image ?? ogImage
+  const jsonLd = buildStructuredData(source, description, ogImage)
   const tags = [
     `<meta name="description" content="${esc(description)}" />`,
     `<link rel="canonical" href="${esc(canonical)}" />`,
@@ -128,7 +147,7 @@ export function buildHead(seo: SeoData | null): { title: string; tags: string } 
     `<meta name="twitter:title" content="${esc(twitterTitle)}" />`,
     `<meta name="twitter:description" content="${esc(twitterDescription)}" />`,
     `<meta name="twitter:image" content="${esc(twitterImage)}" />`,
-    `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    `<script type="application/ld+json">${safeJsonLd(jsonLd)}</script>`,
   ].join('\n    ')
   return { title, tags }
 }

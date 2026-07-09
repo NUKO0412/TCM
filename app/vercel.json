@@ -14,7 +14,10 @@
     }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/connexion", "destination": "/index.html" },
+    { "source": "/reinitialisation", "destination": "/index.html" },
+    { "source": "/admin/messages", "destination": "/index.html" },
+    { "source": "/admin/seo", "destination": "/index.html" }
   ],
   "headers": [
     {

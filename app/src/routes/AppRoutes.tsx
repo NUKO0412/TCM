@@ -2,12 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { ProtectedRoute } from '../features/admin'
 import { ROUTES } from '../config/routes'
+import { LegalPage } from '../components/LegalPage'
 // Accueil importé en eager (pas lazy) : c'est la page pré-rendue dans index.html.
 // Le rendu serveur et le premier rendu client doivent produire le même arbre,
 // synchrone, pour une hydratation sans bascule par Suspense. Les autres pages
 // restent en chargement à la demande (chunks séparés).
 import { Site } from '../Site'
-const LegalPage = lazy(() => import('../components/LegalPage').then((m) => ({ default: m.LegalPage })))
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((m) => ({ default: m.LoginPage })))
 const ResetPasswordPage = lazy(() =>
   import('../features/auth/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })),

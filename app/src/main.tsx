@@ -37,12 +37,12 @@ const tree = (
   </StrictMode>
 )
 
-// La page d'accueil est pré-rendue dans index.html (data-prerendered) : on hydrate
-// pour ne pas re-créer le DOM. Sur une route non-home (lien profond servi par la
-// même index.html via la réécriture SPA), le HTML pré-rendu est celui de l'accueil
-// alors que le client va afficher une autre page : on vide le root et on monte à
-// neuf — comportement identique à aujourd'hui, sans mismatch d'hydratation.
-if (rootEl.dataset.prerendered && window.location.pathname === ROUTES.home) {
+// Les routes pré-rendues en HTML statique sont hydratées ; les routes admin/auth
+// servies par l'index SPA restent montées à neuf.
+const prerenderedRoutes = [ROUTES.home, ROUTES.legal] as string[]
+const canHydratePrerendered = prerenderedRoutes.includes(window.location.pathname)
+
+if (rootEl.dataset.prerendered && canHydratePrerendered) {
   hydrateRoot(rootEl, tree)
 } else {
   if (rootEl.dataset.prerendered) rootEl.innerHTML = ''

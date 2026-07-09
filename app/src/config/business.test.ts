@@ -22,6 +22,15 @@ describe('buildHead (SEO injectée pour les robots)', () => {
     expect(tags).toContain('content="https://www.tcmagencement.fr/custom.png"')
   })
 
+
+  it('émet les zones GEO dans le JSON-LD quand elles existent', () => {
+    const { tags } = buildHead({
+      structuredData: { '@context': 'https://schema.org', '@type': 'GeneralContractor', name: 'TCM Agencement' },
+      geo: { areaServed: ['Lorient', 'Lanester'] },
+    })
+    expect(tags).toContain('"areaServed":["Lorient","Lanester"]')
+  })
+
   it('échappe les caractères dangereux', () => {
     const { tags } = buildHead({ description: 'a & <b> "c"' })
     expect(tags).toContain('&amp;')
